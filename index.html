@@ -5,47 +5,60 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Паша Машины</title>
 <meta name="description" content="Аренда автомобилей в Томске: свободные машины онлайн, бронь за 15 минут, договор с телефона. Пушкина, 61а.">
-<meta name="theme-color" content="#0F1218">
+<meta name="theme-color" content="#07090D" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#E6E9EE" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="img/icon.svg" type="image/svg+xml">
-<link rel="preload" href="fonts/dela-gothic-one-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/golos-text-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/style.css">
+<link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<script>
+  /* Режим экрана выставляем до отрисовки, чтобы не мигало */
+  try { var m = localStorage.getItem("pm_mode"); if (m === "light" || m === "dark") document.documentElement.setAttribute("data-theme", m); } catch (e) {}
+</script>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-<div class="offline-bar" id="offline" hidden>Нет интернета. Показываем сохранённый каталог — бронь отправится, когда связь вернётся.</div>
-<header class="top">
-  <div class="wrap">
-    <a class="logo" href="#" aria-label="Паша Машины, на главную"><span class="logo-mark" aria-hidden="true">ПМ</span><span class="logo-text">Паша <span>Машины</span></span></a>
-    <nav class="nav" aria-label="Основное меню">
-      <a href="#catalog" data-route="catalog">Автопарк</a>
-      <a href="#terms" data-route="terms">Условия</a>
-      <a href="#contacts" data-route="contacts">Контакты</a>
-    </nav>
-    <div class="top-right">
-      <a class="btn btn-ghost btn-sm cab-link" href="#cabinet" data-route="cabinet">Мои брони</a>
-      <a class="phone-link" href="tel:+73822342424">34-24-24<small>Томск, звонок</small></a>
+<div class="shell">
+  <aside class="rail" aria-label="Меню">
+    <a class="rail-logo" href="#" aria-label="Паша Машины, на главную">ПМ</a>
+    <nav class="rail-nav" id="rail-nav" aria-label="Разделы"></nav>
+    <div class="rail-bottom"><button type="button" class="mode-btn" data-mode-toggle aria-label="Режим экрана"></button></div>
+  </aside>
+
+  <div class="main">
+    <div class="wrap">
+      <header class="statusbar">
+        <a class="sb-brand" href="#"><span class="rail-logo-m" aria-hidden="true">ПМ</span><span><b>Паша Машины</b><br><span>аренда авто · Томск</span></span></a>
+        <div class="sb-items">
+          <span class="sb-pill sb-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>Пушкина, 61а</span>
+          <span class="sb-pill sb-net" id="sb-net">В сети</span>
+          <span class="sb-pill sb-clock"><b id="sb-clock">--:--</b></span>
+          <button type="button" class="sb-pill sb-mode" data-mode-toggle aria-label="Режим экрана"></button>
+          <a class="sb-pill" href="tel:+73822342424"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><b>34-24-24</b></a>
+        </div>
+      </header>
+      <div class="offline-bar" id="offline" hidden>Нет интернета. Каталог открыт из сохранённой копии, заявка отправится, когда связь вернётся.</div>
+
+      <main id="app" tabindex="-1"></main>
+
+      <footer class="foot">
+        <span>Паша Машины · аренда авто в Томске · Пушкина, 61а</span>
+        <span>Демо-версия: данные хранятся только в этом браузере. <button type="button" id="reset-demo">Сбросить демо</button> · <a href="#admin">Вход для владельца</a></span>
+      </footer>
     </div>
   </div>
-</header>
-
-<main id="app" tabindex="-1"></main>
-
-<footer class="foot">
-  <div class="wrap">
-    <span>Паша Машины · аренда авто в Томске · Пушкина, 61а</span>
-    <span>Демо-версия: данные хранятся только в этом браузере. <button type="button" id="reset-demo">Сбросить демо</button> · <a href="#admin">Вход для владельца</a></span>
-  </div>
-</footer>
-
-<nav class="tabbar" id="tabbar" aria-label="Навигация"></nav>
+</div>
 
 <script src="js/data.js"></script>
 <script src="js/store.js"></script>
 <script src="js/admin.js"></script>
+<script src="js/assistant.js"></script>
 <script src="js/app.js"></script>
 <script>
-  /* Офлайн-кэш: повторные открытия грузятся мгновенно, каталог доступен без сети */
   (function () {
     var framed; try { framed = window.self !== window.top; } catch (e) { framed = true; }
     if (!framed && "serviceWorker" in navigator && location.protocol === "https:") {
