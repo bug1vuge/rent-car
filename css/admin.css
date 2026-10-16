@@ -9,8 +9,8 @@
 
 .kpis { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 1000px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.kpi { display: grid; gap: 6px; }
-.kpi .k-v { font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 300; letter-spacing: -.03em; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.kpi { display: grid; gap: 6px; align-content: start; }
+.kpi .k-v { white-space: nowrap; font-size: clamp(1.25rem, 5.2vw, 2.3rem); font-weight: 300; letter-spacing: -.03em; font-variant-numeric: tabular-nums; line-height: 1.05; }
 .kpi .k-l { color: var(--mute); font-size: .84rem; }
 .kpi.hot .k-v { color: var(--warn); }
 .admin-cols { display: grid; gap: 16px; margin-top: 16px; }
