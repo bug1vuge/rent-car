@@ -14,7 +14,6 @@
 /* Сцена */
 .stage { position: relative; overflow: hidden; padding: 24px 24px 20px; display: grid; gap: 14px;
   background: linear-gradient(180deg, var(--stage-top), transparent 75%), var(--tile); }
-.stage::after { content: ""; position: absolute; left: 6%; right: 6%; bottom: 96px; height: 1px; background: linear-gradient(90deg, transparent, var(--stroke-2), transparent); pointer-events: none; }
 .stage-top { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
 .stage-top h1 { font-size: clamp(2rem, 4.4vw, 3.4rem); }
 .stage-top p { color: var(--mute); margin-top: 6px; }
