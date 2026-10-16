@@ -1,6 +1,6 @@
 /* Кэш для мгновенной загрузки и работы без сети.
    При изменении файлов увеличьте номер версии. */
-const VERSION = "rc-v6";
+const VERSION = "rc-v7";
 const ASSETS = [
   "./", "index.html", "manifest.webmanifest",
   "css/tokens.css", "css/base.css", "css/shell.css", "css/home.css", "css/pages.css", "css/admin.css", "css/intro.css", "css/controls.css",
