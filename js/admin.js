@@ -9,12 +9,12 @@
   const isoT = () => U.iso(U.today());
 
   function gate() {
-    return `<div class="wrap pin-box"><form class="panel" id="pin-form">
+    return `<div class="pin-box"><form class="panel" id="pin-form">
       <h2>Вход для владельца</h2>
       <p class="muted small">В полной версии вход по номеру телефона и коду из Max. Для демо PIN: <b>2002</b></p>
       <div class="field"><label for="pin">PIN-код</label><input class="input pin-input" id="pin" inputmode="numeric" maxlength="4" autocomplete="off"></div>
       <span class="err-msg" id="pin-err" hidden>Неверный PIN. Для демо это 2002</span>
-      <button class="btn btn-gold btn-block" type="submit">Войти</button></form></div>`;
+      <button class="btn btn-primary btn-block" type="submit">Войти</button></form></div>`;
   }
 
   function counts() { const c = {}; S.bookings.forEach((b) => { c[b.status] = (c[b.status] || 0) + 1; }); return c; }
@@ -23,8 +23,8 @@
     if (!authed()) return gate();
     const c = counts();
     const tabs = [["summary", "Сводка"], ["requests", "Заявки", c.new], ["calendar", "Календарь"], ["fleet", "Автопарк"]];
-    return `<div class="admin-bar"><div class="wrap"><span>Панель владельца · демо</span><a href="#" style="text-decoration:underline">Вернуться на сайт</a></div></div>
-      <div class="wrap"><div class="admin-tabs" role="tablist">${tabs.map(([k, l, n]) => `<button role="tab" aria-selected="${tab === k}" data-tab="${k}">${l}${n ? `<span class="cnt">${n}</span>` : ""}</button>`).join("")}</div>
+    return `<div class="admin-bar"><span>Панель владельца · демо</span><a href="#">Вернуться на сайт</a></div>
+      <div><div class="admin-tabs" role="tablist">${tabs.map(([k, l, n]) => `<button role="tab" aria-selected="${tab === k}" data-tab="${k}">${l}${n ? `<span class="cnt">${n}</span>` : ""}</button>`).join("")}</div>
       <div id="admin-body">${body()}</div></div>`;
   }
   function body() { return { summary, requests, calendar, fleet }[tab](); }
@@ -52,7 +52,7 @@
       </div>
       <div class="admin-cols">
         <div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h3>Загрузка парка на 2 недели</h3><span class="small muted">Впереди по броням: ${U.rub(pipeline)}</span></div>
-          <div class="load-chart" role="img" aria-label="Загрузка по дням">${load.map((x) => `<div class="load-col ${[0, 6].includes(x.d.getDay()) ? "wk" : ""}" title="${U.fmtDate(U.iso(x.d))}: занято ${x.busy} из ${cars.length}"><div class="load-bar" style="height:${x.pct}%"></div><span class="load-x">${x.d.getDate()}</span></div>`).join("")}</div>
+          <div class="load-chart" role="img" aria-label="Загрузка по дням">${load.map((x) => `<div class="load-col ${[0, 6].includes(x.d.getDay()) ? "wk" : ""}" title="${U.fmtDate(U.iso(x.d))}: занято ${x.busy} из ${cars.length}"><div class="load-track"><div class="load-bar" style="height:${x.pct}%"></div></div><span class="load-x">${x.d.getDate()}</span></div>`).join("")}</div>
           <p class="small muted">Доля машин в аренде или на ТО по дням. Тёмные столбцы — выходные.</p></div>
         <div class="panel"><h3>Сегодня</h3><div class="today-list">
           ${outs.map((b) => `<div class="today-item"><span class="tag tag-out">Выдача</span><span>${esc(carName(S.car(b.carId)))} · ${esc(b.client.name)}</span></div>`).join("")}
@@ -60,7 +60,7 @@
           ${!outs.length && !ins.length ? '<p class="muted small">Выдач и возвратов сегодня нет.</p>' : ""}
           ${soon.length ? `<span class="small muted" style="margin-top:6px">Ближайшие возвраты</span>${soon.map((b) => `<div class="today-item"><span class="tag tag-in">${U.fmtDate(b.to, { day: "numeric", month: "short" })}</span><span>${esc(carName(S.car(b.carId)))} · ${esc(b.client.name)}</span></div>`).join("")}` : ""}
         </div>
-        ${c.new ? `<button class="btn btn-gold" data-goto="requests">Разобрать новые заявки (${c.new})</button>` : ""}</div>
+        ${c.new ? `<button class="btn btn-primary" data-goto="requests">Разобрать новые заявки (${c.new})</button>` : ""}</div>
       </div>`;
   }
 
@@ -70,7 +70,7 @@
     const filters = [["new", "Новые"], ["approved", "Подтверждённые"], ["active", "В аренде"], ["done", "Завершённые"], ["rejected", "Отклонённые"], ["all", "Все"]];
     const list = S.bookings.filter((b) => reqFilter === "all" || b.status === reqFilter);
     return `<div class="chips" style="margin-bottom:16px">${filters.map(([k, l]) => `<button class="chip" data-rf="${k}" aria-pressed="${reqFilter === k}">${l}${k !== "all" && c[k] ? " · " + c[k] : ""}</button>`).join("")}</div>
-      <div class="req-list">${list.length ? list.map(reqCard).join("") : '<div class="empty"><h3>Здесь пусто</h3><p class="muted">Новые заявки с сайта появляются в этой вкладке. Попробуй сам оформить бронь в каталоге.</p><a class="btn btn-gold" href="#catalog">Открыть каталог</a></div>'}</div>`;
+      <div class="req-list">${list.length ? list.map(reqCard).join("") : '<div class="empty"><h3>Здесь пусто</h3><p class="muted">Новые заявки с сайта появляются в этой вкладке. Попробуй сам оформить бронь в каталоге.</p><a class="btn btn-primary" href="#catalog">Открыть каталог</a></div>'}</div>`;
   }
   function reqCard(b) {
     const car = S.car(b.carId); const cl = car ? PM.CLASSES[car.cls] : null;
@@ -82,14 +82,14 @@
     const docNames = { pass1: "Паспорт, фото", pass2: "Паспорт, прописка", lic1: "Права, лицо", lic2: "Права, оборот" };
     const actions = {
       new: `<button class="btn btn-go btn-sm" data-act="approved" data-id="${b.id}" ${conflict ? "disabled" : ""}>Подтвердить</button><button class="btn btn-stop btn-sm" data-act="rejected" data-id="${b.id}">Отклонить</button>`,
-      approved: `<button class="btn btn-gold btn-sm" data-act="active" data-id="${b.id}">Машина выдана</button><button class="btn btn-stop btn-sm" data-act="rejected" data-id="${b.id}">Отменить</button>`,
-      active: `<button class="btn btn-gold btn-sm" data-act="done" data-id="${b.id}">Машину вернули</button>`
+      approved: `<button class="btn btn-primary btn-sm" data-act="active" data-id="${b.id}">Машина выдана</button><button class="btn btn-stop btn-sm" data-act="rejected" data-id="${b.id}">Отменить</button>`,
+      active: `<button class="btn btn-primary btn-sm" data-act="done" data-id="${b.id}">Машину вернули</button>`
     }[b.status] || "";
     return `<article class="req s-${b.status}">
       <div class="req-head"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h3 style="font-size:1.1rem">${esc(carName(car))}</h3>${PM.statusPill(b.status)}${b.mine ? '<span class="pill p-active">с сайта, только что</span>' : ""}</div><span class="muted small num">${esc(b.id)} · создана ${U.fmtDate(b.createdAt, { day: "numeric", month: "short" })}</span></div>
       <div class="req-grid">
         <div><span>Клиент</span>${esc(b.client.name)}</div>
-        <div><span>Телефон</span><span style="color:var(--chrome);font-size:.92rem" class="num">${esc(b.client.phone)}</span></div>
+        <div><span>Телефон</span><span style="color:var(--fg);font-size:.92rem" class="num">${esc(b.client.phone)}</span></div>
         <div><span>Даты</span>${U.fmtDate(b.from, { day: "numeric", month: "short" })} — ${U.fmtDate(b.to, { day: "numeric", month: "short" })}, ${U.days(b.from, b.to)} сут.</div>
         <div><span>Сумма</span><b class="num">${U.rub(b.total)}</b>${b.deposit ? ` <span style="display:inline;color:var(--mute)">+ залог ${U.rub(b.deposit)}</span>` : ""}</div>
         <div><span>Возраст / стаж</span><span style="display:inline;font-size:.92rem;color:${okAge ? "var(--go)" : "var(--stop)"}">${age} ${U.plural(age, "год", "года", "лет")}</span> / <span style="display:inline;font-size:.92rem;color:${okExp ? "var(--go)" : "var(--stop)"}">${exp} ${U.plural(exp, "год", "года", "лет")}</span></div>
@@ -117,16 +117,16 @@
       const svc = car.status === "service" ? `<div class="g-bar gb-service" style="left:calc(170px + ${colW} * 3 + 2px);right:4px">На ТО</div>` : "";
       return `<div class="g-row"><div class="g-name">${esc(carName(car))}<span class="plate">${esc(car.plate)}</span></div>${days.map((d) => `<div class="g-cell ${[0, 6].includes(d.getDay()) ? "wk" : ""} ${U.iso(d) === isoT() ? "today" : ""}"></div>`).join("")}${bars}${svc}</div>`;
     }).join("");
-    return `<div class="legend" style="margin-bottom:12px"><span><i style="background:var(--pending)"></i>Новая заявка</span><span><i style="background:var(--go)"></i>Подтверждена</span><span><i style="background:var(--service)"></i>В аренде</span><span><i style="background:var(--line)"></i>На ТО</span></div>
+    return `<div class="legend" style="margin-bottom:12px"><span><i style="background:var(--warn)"></i>Новая заявка</span><span><i style="background:var(--go)"></i>Подтверждена</span><span><i style="background:var(--accent)"></i>В аренде</span><span><i style="background:var(--stroke-2)"></i>На ТО</span></div>
       <div class="gantt-wrap"><div class="gantt">${head}${rows}</div></div>`;
   }
 
   /* ——— Автопарк ——— */
   function fleet() {
-    return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px"><p class="muted small" style="max-width:60ch">Статус и цена сразу меняются на сайте. Машина «На ТО» или «Скрыта» не показывается свободной.</p><button class="btn btn-gold btn-sm" data-addcar>Добавить машину</button></div>
+    return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px"><p class="muted small" style="max-width:60ch">Статус и цена сразу меняются на сайте. Машина «На ТО» или «Скрыта» не показывается свободной.</p><button class="btn btn-primary btn-sm" data-addcar>Добавить машину</button></div>
       <div class="fleet" style="padding-bottom:56px">${S.cars.map((c) => `<div class="fleet-row">
-        <img src="${c.img}" alt="">
-        <div style="min-width:0"><b>${esc(carName(c))}</b> <span class="muted small">${c.year}</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px"><span class="plate">${esc(c.plate)}</span><span class="small muted">${PM.CLASSES[c.cls].label} · ${esc(c.kpp)}</span></div><span class="small status st-${S.liveStatus(c).key}" style="position:static;background:none;padding:4px 0 0;backdrop-filter:none">${esc(c.status === "hidden" ? "Скрыта с сайта" : S.liveStatus(c).label)}</span></div>
+        <div class="fimg"><img src="${c.cut || c.img}" alt=""></div>
+        <div style="min-width:0"><b>${esc(carName(c))}</b> <span class="muted small">${c.year}</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px"><span class="plate">${esc(c.plate)}</span><span class="small muted">${PM.CLASSES[c.cls].label} · ${esc(c.kpp)}</span></div><span class="small st-${S.liveStatus(c).key}" style="display:block;padding-top:4px;font-weight:600">${esc(c.status === "hidden" ? "Скрыта с сайта" : S.liveStatus(c).label)}</span></div>
         <div class="f-controls">
           <div class="field"><label for="st-${c.id}">Статус</label><select class="input" id="st-${c.id}" data-status="${c.id}"><option value="free" ${c.status === "free" ? "selected" : ""}>В работе</option><option value="service" ${c.status === "service" ? "selected" : ""}>На ТО</option><option value="hidden" ${c.status === "hidden" ? "selected" : ""}>Скрыта</option></select></div>
           <div class="field"><label for="pr-${c.id}">Цена 1–2 сут, ₽</label><input class="input num" id="pr-${c.id}" type="number" min="500" step="100" value="${c.prices[0]}" data-price="${c.id}"></div>
@@ -145,7 +145,7 @@
       <label class="toggle"><input type="checkbox" id="a-taxi"> Можно под такси</label>
       <label class="upload" for="a-photo" style="aspect-ratio:16/7" id="a-photo-box"><input type="file" id="a-photo" accept="image/*"><span class="u-label">Фото машины<small>Можно прямо из сторис</small></span></label>
       <span class="err-msg" id="a-err" hidden>Укажи марку, модель и добавь фото</span>
-      <button class="btn btn-gold" type="submit">Добавить в автопарк</button></form>`;
+      <button class="btn btn-primary" type="submit">Добавить в автопарк</button></form>`;
   }
 
   function bind() {
