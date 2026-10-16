@@ -12,9 +12,13 @@ PM.BIZ = {
   phonePretty: "+7 (3822) 34-24-24",
   hours: "Ежедневно, 9:00–21:00",
   lessor: "ИП ________________ (данные владельца)",
-  yandex: "https://yandex.ru/maps/?text=" + encodeURIComponent("Томск, улица Пушкина, 61а"),
-  yandexWidget: "https://yandex.ru/map-widget/v1/?text=" + encodeURIComponent("Томск, улица Пушкина, 61а") + "&z=16",
-  gis: "https://2gis.ru/tomsk/search/" + encodeURIComponent("Пушкина 61а"),
+  /* Координаты точки выдачи (по данным 2ГИС): широта 56.499881, долгота 84.988441 */
+  lat: 56.499881,
+  lon: 84.988441,
+  yandex: "https://yandex.ru/maps/?pt=84.988441,56.499881&z=17&l=map",
+  yandexRoute: "https://yandex.ru/maps/?rtext=~56.499881,84.988441&rtt=auto",
+  yandexWidget: "https://yandex.ru/map-widget/v1/?ll=84.988441%2C56.499881&z=16&pt=84.988441%2C56.499881%2Cpm2blm",
+  gis: "https://2gis.ru/tomsk/firm/422740746064782",
   vk: "https://vk.com/",
   max: "https://max.ru/"
 };

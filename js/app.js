@@ -608,7 +608,7 @@
         <div class="c-item"><span class="muted small">Телефон</span><span class="c-v big" data-copy-src>${B.phoneShort}</span><span class="muted small">${B.phonePretty}</span>
           <div class="c-actions"><a class="btn btn-primary btn-sm" href="tel:${B.phoneTel}">Позвонить</a><button class="btn btn-ghost btn-sm" data-copy="${B.phonePretty}">Скопировать номер</button></div></div>
         <div class="c-item"><span class="muted small">Адрес</span><span class="c-v">${B.city}, ${B.address}</span><span class="muted">${B.place}</span>
-          <div class="c-actions"><a class="btn btn-ghost btn-sm" href="${B.yandex}" target="_blank" rel="noopener">Яндекс Карты</a><a class="btn btn-ghost btn-sm" href="${B.gis}" target="_blank" rel="noopener">2ГИС</a></div></div>
+          <div class="c-actions"><a class="btn btn-ghost btn-sm" href="${B.yandexRoute}" target="_blank" rel="noopener">Маршрут в Яндекс Картах</a><a class="btn btn-ghost btn-sm" href="${B.gis}" target="_blank" rel="noopener">2ГИС</a></div></div>
         <div class="c-item"><span class="muted small">Режим работы</span><span class="c-v">${B.hours}</span><span class="muted">Выдача и возврат вне графика — по договорённости</span></div>
         <div class="c-item"><span class="muted small">Написать</span><span class="muted">VK и Max работают даже когда мобильный интернет ограничен</span>
           <div class="c-actions"><a class="btn btn-ghost btn-sm" href="${B.vk}" target="_blank" rel="noopener">ВКонтакте</a><a class="btn btn-ghost btn-sm" href="${B.max}" target="_blank" rel="noopener">Max</a></div></div>
