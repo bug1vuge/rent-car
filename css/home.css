@@ -88,6 +88,7 @@
 .navmap .nm-pin { fill: var(--go); }
 .navmap .nm-pin-dot { fill: var(--tile-2); }
 .navmap .nm-label { fill: var(--mute); font: 500 11px var(--font); }
+.navmap .nm-center path { fill: none; stroke: var(--mute); stroke-width: 1.5; stroke-linecap: round; }
 .navmap .nm-turn { position: absolute; left: 10px; top: 10px; display: flex; gap: 10px; align-items: center; background: var(--tile-solid); border: 1px solid var(--stroke); border-radius: 14px; padding: 8px 12px 8px 8px; font-size: .8rem; z-index: 2; }
 .navmap .nm-turn i { width: 30px; height: 30px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-style: normal; }
 .navmap .nm-turn i svg { width: 18px; height: 18px; }

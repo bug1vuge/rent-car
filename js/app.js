@@ -163,6 +163,9 @@
       <circle class="nm-pulse" cx="270" cy="118" r="30"/>
       <g transform="translate(270 124)"><path class="nm-pin" d="M0 0 C-14 -16 -14 -36 0 -38 C14 -36 14 -16 0 0Z"/><circle class="nm-pin-dot" cx="0" cy="-25" r="6"/></g>
       <text class="nm-label" x="300" y="152">Мерседес-центр</text>
+      <text class="nm-label" x="80" y="268">Октябрьский р-н</text>
+      <g class="nm-center"><path d="M14 296 L30 280 M14 296 l9 -1 M14 296 l1 -9"/></g>
+      <text class="nm-label" x="34" y="294">центр ≈ 3 км</text>
       <text class="nm-label" x="150" y="190" transform="rotate(-3 150 190)">ул. Пушкина</text>
     </svg>`;
   };
@@ -607,7 +610,7 @@
       <div class="c-list">
         <div class="c-item"><span class="muted small">Телефон</span><span class="c-v big" data-copy-src>${B.phoneShort}</span><span class="muted small">${B.phonePretty}</span>
           <div class="c-actions"><a class="btn btn-primary btn-sm" href="tel:${B.phoneTel}">Позвонить</a><button class="btn btn-ghost btn-sm" data-copy="${B.phonePretty}">Скопировать номер</button></div></div>
-        <div class="c-item"><span class="muted small">Адрес</span><span class="c-v">${B.city}, ${B.address}</span><span class="muted">${B.place}</span>
+        <div class="c-item"><span class="muted small">Адрес</span><span class="c-v">${B.city}, ${B.address}</span><span class="muted">${B.place}</span><span class="muted small">${B.district}</span>
           <div class="c-actions"><a class="btn btn-ghost btn-sm" href="${B.yandexRoute}" target="_blank" rel="noopener">Маршрут в Яндекс Картах</a><a class="btn btn-ghost btn-sm" href="${B.gis}" target="_blank" rel="noopener">2ГИС</a></div></div>
         <div class="c-item"><span class="muted small">Режим работы</span><span class="c-v">${B.hours}</span><span class="muted">Выдача и возврат вне графика — по договорённости</span></div>
         <div class="c-item"><span class="muted small">Написать</span><span class="muted">VK и Max работают даже когда мобильный интернет ограничен</span>
