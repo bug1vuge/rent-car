@@ -1,10 +1,10 @@
 {
-  "name": "Паша Машины — аренда авто в Томске",
-  "short_name": "Паша Машины",
+  "name": "RentCar — аренда авто в Томске",
+  "short_name": "RentCar",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0F1218",
-  "theme_color": "#0F1218",
+  "background_color": "#07090D",
+  "theme_color": "#07090D",
   "lang": "ru",
   "icons": [{ "src": "img/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
 }
