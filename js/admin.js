@@ -37,6 +37,7 @@
     const freeNow = cars.filter((x) => S.liveStatus(x).key === "free").length;
     const monthAgo = U.iso(U.addDays(t, -30));
     const revenue = S.bookings.filter((b) => ["approved", "active", "done"].includes(b.status) && b.from >= monthAgo && b.from <= ti).reduce((s, b) => s + b.total, 0);
+    const online = S.bookings.filter((b) => b.payment && b.payment.status === "paid" && b.from >= monthAgo).reduce((s, b) => s + b.total, 0);
     const pipeline = S.bookings.filter((b) => ["new", "approved"].includes(b.status) && b.from > ti).reduce((s, b) => s + b.total, 0);
     const days = [...Array(14)].map((_, i) => U.addDays(t, i));
     const load = days.map((d) => { const s = U.iso(d), s1 = U.iso(U.addDays(d, 1)); const busy = cars.filter((car) => car.status === "service" || S.carBookings(car.id, S.BLOCKING).some((b) => U.overlap(s, s1, b.from, b.to))).length; return { d, pct: cars.length ? Math.round(busy / cars.length * 100) : 0, busy }; });
@@ -47,7 +48,7 @@
     return `<div class="kpis">
         <div class="kpi hot"><span class="k-v">${c.new || 0}</span><span class="k-l">${U.plural(c.new || 0, "новая заявка", "новые заявки", "новых заявок")}</span></div>
         <div class="kpi"><span class="k-v">${freeNow} / ${cars.length}</span><span class="k-l">машин свободно сейчас</span></div>
-        <div class="kpi"><span class="k-v">${U.rub(revenue)}</span><span class="k-l">выручка за 30 дней</span></div>
+        <div class="kpi"><span class="k-v">${U.rub(revenue)}</span><span class="k-l">выручка за 30 дней, онлайн ${U.rub(online)}</span></div>
         <div class="kpi"><span class="k-v">${week}%</span><span class="k-l">загрузка парка на неделю</span></div>
       </div>
       <div class="admin-cols">
@@ -86,7 +87,7 @@
       active: `<button class="btn btn-primary btn-sm" data-act="done" data-id="${b.id}">Машину вернули</button>`
     }[b.status] || "";
     return `<article class="req s-${b.status}">
-      <div class="req-head"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h3 style="font-size:1.1rem">${esc(carName(car))}</h3>${RC.statusPill(b.status)}${b.mine ? '<span class="pill p-active">с сайта, только что</span>' : ""}</div><span class="muted small num">${esc(b.id)} · создана ${U.fmtDate(b.createdAt, { day: "numeric", month: "short" })}</span></div>
+      <div class="req-head"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h3 style="font-size:1.1rem">${esc(carName(car))}</h3>${RC.statusPill(b.status)}${RC.pay.paymentPill(b)}${b.mine ? '<span class="pill p-active">с сайта, только что</span>' : ""}</div><span class="muted small num">${esc(b.id)} · создана ${U.fmtDate(b.createdAt, { day: "numeric", month: "short" })}</span></div>
       <div class="req-grid">
         <div><span>Клиент</span>${esc(b.client.name)}</div>
         <div><span>Телефон</span><span style="color:var(--fg);font-size:.92rem" class="num">${esc(b.client.phone)}</span></div>
@@ -97,7 +98,8 @@
       </div>
       ${conflict ? '<div class="notice warn">Эти даты уже заняты другой подтверждённой бронью. Предложи клиенту другую машину.</div>' : ""}
       ${docs.length ? `<div class="docs-thumbs">${docs.map(([k, v]) => `<button data-doc="${b.id}|${k}" aria-label="${docNames[k]}"><img src="${v}" alt=""></button>`).join("")}</div>` : (b.demo ? '<p class="small muted">Документы демо-клиента проверены ранее.</p>' : "")}
-      <div class="req-actions">${actions}<button class="btn btn-ghost btn-sm" data-contract="${b.id}">Договор</button></div>
+      ${b.insurance ? `<div class="notice ok small">Страховка оформлена автоматически: сертификат № ${esc(b.insurance.no)} к открытому полису</div>` : ""}
+      <div class="req-actions">${actions}<button class="btn btn-ghost btn-sm" data-contract="${b.id}">Договор</button>${b.insurance ? `<button class="btn btn-ghost btn-sm" data-ins="${b.id}">Страховка</button>` : ""}</div>
     </article>`;
   }
 
@@ -155,10 +157,12 @@
     $$("[data-goto]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.goto; reqFilter = "new"; RC.route(); }));
     $$("[data-rf]").forEach((b) => b.addEventListener("click", () => { reqFilter = b.dataset.rf; RC.route(); }));
     $$("[data-act]").forEach((b) => b.addEventListener("click", () => {
-      const msg = { approved: "Бронь подтверждена. Клиенту уйдёт уведомление", rejected: "Заявка отклонена", active: "Отмечено: машина выдана", done: "Машина вернулась в парк" }[b.dataset.act];
+      const bk = S.booking(b.dataset.id);
+      const msg = { approved: "Бронь подтверждена. Страховка оформлена автоматически, клиенту ушло уведомление", rejected: bk && bk.payment && bk.payment.status === "paid" ? "Заявка отклонена. Оплата вернётся клиенту автоматически" : "Заявка отклонена", active: "Отмечено: машина выдана", done: "Машина вернулась в парк" }[b.dataset.act];
       S.setStatus(b.dataset.id, b.dataset.act); RC.toast(msg); RC.route();
     }));
     $$("[data-contract]").forEach((b) => b.addEventListener("click", () => RC.openContract(b.dataset.contract)));
+    $$("[data-ins]").forEach((b) => b.addEventListener("click", () => RC.insurance.open(b.dataset.ins)));
     $$("[data-doc]").forEach((b) => b.addEventListener("click", () => { const [id, k] = b.dataset.doc.split("|"); RC.modal("Документ клиента", `<img class="doc-big" src="${S.booking(id).docs[k]}" alt="Фото документа">`); }));
     $$("[data-status]").forEach((s) => s.addEventListener("change", () => { S.updateCar(s.dataset.status, { status: s.value }); RC.toast("Статус обновлён на сайте"); RC.route(); }));
     $$("[data-price]").forEach((i) => i.addEventListener("change", () => {

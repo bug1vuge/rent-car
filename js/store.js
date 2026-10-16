@@ -17,7 +17,7 @@ RC.util = {
 };
 
 RC.store = (function () {
-  const KEY = "rc_demo_v2";
+  const KEY = "rc_demo_v3";
   let state = null;
 
   function load() {
@@ -27,7 +27,11 @@ RC.store = (function () {
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* хранилище недоступно: работаем в памяти */ } }
   function reset(doSave = true) {
     state = { cars: JSON.parse(JSON.stringify(RC.SEED_CARS)), bookings: RC.seedBookings(), seq: 1047 };
-    state.bookings.forEach((b) => { const car = state.cars.find((c) => c.id === b.carId); const q = quote(car, b.from, b.to, b.extras); b.total = q.total; b.deposit = q.deposit; });
+    state.bookings.forEach((b) => {
+      const car = state.cars.find((c) => c.id === b.carId); const q = quote(car, b.from, b.to, b.extras); b.total = q.total; b.deposit = q.deposit;
+      b.payment = b.payment ? Object.assign({ amount: q.total, depositHeld: q.deposit, paidAt: b.createdAt }, b.payment) : { status: "onsite" };
+      if (["approved", "active", "done"].includes(b.status)) issueInsurance(b, false);
+    });
     if (doSave) save(); else save();
   }
 
@@ -75,7 +79,26 @@ RC.store = (function () {
     b.status = "new";
     state.bookings.unshift(b); save(); return b;
   }
-  function setStatus(id, status) { const b = state.bookings.find((x) => x.id === id); if (b) { b.status = status; save(); } return b; }
+  function setStatus(id, status) {
+    const b = state.bookings.find((x) => x.id === id); if (!b) return b;
+    b.status = status;
+    if (status === "approved") issueInsurance(b, false);              // страховка выписывается сама при подтверждении
+    if (status === "rejected" && b.payment && b.payment.status === "paid") b.payment.status = "refunded"; // возврат денег
+    save(); return b;
+  }
+  /* Сертификат к открытому полису владельца: на конкретную машину, водителя и срок аренды */
+  function issueInsurance(b, doSave = true) {
+    if (b.insurance) return b.insurance;
+    const car = state.cars.find((c) => c.id === b.carId);
+    b.insurance = { no: RC.BIZ.insurance.prefix + "-" + b.id.replace(/\D/g, "") + "-" + (car ? car.plate.replace(/\s/g, "").slice(-3) : "000"),
+      issuedAt: RC.util.iso(RC.util.today()), kasko: !!car && car.cls === "premium" };
+    if (doSave) save(); return b.insurance;
+  }
+  function setPaid(id, method) {
+    const b = state.bookings.find((x) => x.id === id); if (!b) return b;
+    b.payment = { status: "paid", method, amount: b.total, depositHeld: b.deposit, paidAt: RC.util.iso(RC.util.today()) };
+    save(); return b;
+  }
   function updateCar(id, patch) { const c = state.cars.find((x) => x.id === id); if (c) { Object.assign(c, patch); save(); } return c; }
   function addCar(car) { state.cars.push(car); save(); }
   function removeCar(id) { state.cars = state.cars.filter((c) => c.id !== id); save(); }
@@ -87,6 +110,6 @@ RC.store = (function () {
     car: (id) => state.cars.find((c) => c.id === id),
     booking: (id) => state.bookings.find((b) => b.id === id),
     visibleCars: () => state.cars.filter((c) => c.status !== "hidden"),
-    carBookings, isFree, liveStatus, quote, tierIndex, addBooking, setStatus, updateCar, addCar, removeCar, reset, save, BLOCKING
+    carBookings, isFree, liveStatus, quote, tierIndex, addBooking, setStatus, setPaid, issueInsurance, updateCar, addCar, removeCar, reset, save, BLOCKING
   };
 })();

@@ -45,13 +45,14 @@
       <p><b>Арендодатель:</b> ${esc(B.lessor)}, и <b>Арендатор:</b> ${esc(c.name || "________________")}, дата рождения ${c.birth ? U.fmtDate(c.birth, { day: "2-digit", month: "2-digit", year: "numeric" }) : "__.__.____"}, водительское удостоверение № ${esc(c.license || "__ __ ______")}, заключили настоящий договор о нижеследующем.</p>
       <h5>1. Предмет договора</h5>
       <p>1.1. Арендодатель передаёт во временное владение и пользование автомобиль ${esc(car.brand + " " + car.model)}, ${car.year} г. в., цвет ${esc(car.color.toLowerCase())}, гос. номер ${esc(car.plate)}, КПП: ${esc(car.kpp)}, топливо: ${esc(car.fuel.toLowerCase())}.</p>
-      <p>1.2. Автомобиль передаётся технически исправным, с полным баком, комплектом зимней резины и полисом ОСАГО${car.cls === "premium" ? " и КАСКО" : ""}.</p>
+      <p>1.2. Автомобиль передаётся технически исправным, с полным баком и комплектом зимней резины. Автомобиль застрахован по открытому полису Арендодателя ${esc(RC.BIZ.insurance.policy)}${car.cls === "premium" ? " (ОСАГО и КАСКО)" : " (ОСАГО)"}; на срок аренды на Арендатора оформляется сертификат${b.insurance ? " № " + esc(b.insurance.no) : ", который выдаётся автоматически при подтверждении бронирования"}.</p>
       <h5>2. Срок аренды</h5>
       <p>2.1. С ${U.fmtDate(b.from, { day: "numeric", month: "long", year: "numeric" })} по ${U.fmtDate(b.to, { day: "numeric", month: "long", year: "numeric" })} (${q.days} ${U.plural(q.days, "сутки", "суток", "суток")}). Место передачи и возврата: г. Томск, ${esc(B.address)}${(b.extras || []).includes("delivery") ? " либо адрес подачи, согласованный с Арендатором" : ""}.</p>
       <h5>3. Арендная плата и залог</h5>
       <p>3.1. Стоимость аренды — ${U.rub(q.perDay)} в сутки, итого ${U.rub(q.total)} с учётом дополнительных услуг: ${esc(extras)}.</p>
       <p>3.2. Залог — ${q.deposit ? U.rub(q.deposit) : "не взимается (тариф «Без залога»)"}. Залог возвращается после осмотра автомобиля при отсутствии повреждений, а при наличии неоплаченных штрафов — в течение 10 дней.</p>
-      <p>3.3. Лимит пробега — ${(b.extras || []).includes("unlim") ? "не установлен" : RC.CLASSES[car.cls].mileage + " км в сутки, превышение — 5 ₽ за км"}.</p>
+      <p>3.3. Порядок оплаты — ${b.payment && b.payment.status === "paid" ? "оплачено онлайн (" + esc(b.payment.method) + ")" : "при получении автомобиля"}.</p>
+      <p>3.4. Лимит пробега — ${(b.extras || []).includes("unlim") ? "не установлен" : RC.CLASSES[car.cls].mileage + " км в сутки, превышение — 5 ₽ за км"}.</p>
       <h5>4. Обязанности Арендатора</h5>
       <p>4.1. Не передавать управление третьим лицам, не курить в салоне (штраф 5 000 ₽), не использовать автомобиль в соревнованиях и для буксировки.</p>
       <p>4.2. Вернуть автомобиль в срок, в чистом виде и с полным баком. Опоздание более 2 часов оплачивается как полные сутки.</p>
@@ -214,14 +215,14 @@
       </section>
       <section class="tile w-dates" id="w-dates"></section>
       <section class="tile w-pay">
-        <div class="tile-head"><div><h3>Оплата</h3><p>При получении машины</p></div></div>
+        <div class="tile-head"><div><h3>Оплата</h3><p>Онлайн, без переводов «на карту»</p></div></div>
         <div class="paycard">
-          <div class="pc-row"><small>Залог возвращаем после осмотра</small><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".7"><path d="M8.5 8.5a5 5 0 0 1 0 7M12 6a8.5 8.5 0 0 1 0 12M15.5 3.5a12 12 0 0 1 0 17"/></svg></div>
-          <div class="pc-row"><div class="pc-ways"><span>Карта</span><span>СБП</span><span>Наличные</span></div></div>
-          <div class="pc-row col"><b id="pay-deposit"></b><small>Онлайн-предоплата появится в полной версии</small></div>
+          <div class="pc-row"><small>Онлайн при бронировании или на месте</small><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".7"><path d="M8.5 8.5a5 5 0 0 1 0 7M12 6a8.5 8.5 0 0 1 0 12M15.5 3.5a12 12 0 0 1 0 17"/></svg></div>
+          <div class="pc-row"><div class="pc-ways"><span>СБП</span><span>Карта онлайн</span><span>На месте</span></div></div>
+          <div class="pc-row col"><b id="pay-deposit"></b><small>замораживается и возвращается после осмотра</small></div>
         </div>
         <button class="btn btn-go btn-block" style="margin-top:14px" data-book-stage>Забронировать</button>
-        <div class="secure">${ICO.lock}Документы видит только владелец</div>
+        <div class="secure">${ICO.lock}Страховка оформляется автоматически</div>
       </section>
       <section class="tile recs">
         <div class="tile-head"><div><h3>Рекомендуем</h3><p>Свободны на ближайшие дни</p></div><a class="tile-link" href="#catalog" aria-label="Весь автопарк">${ICO.right}</a></div>
@@ -488,14 +489,17 @@
         <label class="check"><input type="checkbox" id="w-agree" ${W.agree ? "checked" : ""}> Прочитал договор и <a href="#terms">условия аренды</a>, согласен</label>
         <label class="check"><input type="checkbox" id="w-pd" ${W.agreePd ? "checked" : ""}> Согласен на обработку персональных данных (152-ФЗ)</label>
         ${err("agree")}
-        <div class="notice">Оплата аренды и залога — при получении машины, наличными, картой или по СБП. В полной версии можно будет внести предоплату онлайн.</div>
-        ${nav("Отправить заявку")}`;
+        <div class="fgroup"><span class="flabel">Оплата</span><div class="opts">
+          <label class="opt"><input type="radio" name="pay" value="online" ${W.pay !== "onsite" ? "checked" : ""}><span class="opt-t">Онлайн сейчас<small>СБП или картой на странице банка. Залог ${U.rub(S.quote(car, W.from, W.to, W.extras).deposit)} только замораживается и снимается с блокировки после возврата</small></span><span class="opt-p">${U.rub(S.quote(car, W.from, W.to, W.extras).total)}</span></label>
+          <label class="opt"><input type="radio" name="pay" value="onsite" ${W.pay === "onsite" ? "checked" : ""}><span class="opt-t">При получении машины<small>Наличные, карта или СБП на месте</small></span></label>
+        </div></div>
+        ${nav(W.pay === "onsite" ? "Отправить заявку" : "Отправить и оплатить")}`;
     }
   }
   function readStep() {
     if (W.step === 0) { W.from = $("#w-from").value; W.to = $("#w-to").value; W.extras = $$('input[name="extra"]:checked').map((i) => i.value); }
     if (W.step === 1) { Object.assign(W.client, { name: $("#w-name").value.trim(), phone: $("#w-phone").value.trim(), birth: $("#w-birth").value, license: $("#w-lic").value.trim(), licenseSince: $("#w-since").value }); try { localStorage.setItem("rc_client", JSON.stringify(W.client)); } catch (e) {} }
-    if (W.step === 3) { W.agree = $("#w-agree").checked; W.agreePd = $("#w-pd").checked; }
+    if (W.step === 3) { W.agree = $("#w-agree").checked; W.agreePd = $("#w-pd").checked; const p = $('input[name="pay"]:checked'); W.pay = p ? p.value : "online"; }
   }
   function validate(car) {
     const e = {}, cl = RC.CLASSES[car.cls], c = W.client;
@@ -541,15 +545,28 @@
       }));
       $("[data-sample]", form).addEventListener("click", () => { DOCS.forEach(([k, t, s]) => { W.docs[k] = sampleDoc(t, s); }); W.errors = {}; rerenderWizard(car); });
     }
-    if (W.step === 3) initSignature($("#sign"), (data) => { W.signature = data; });
+    if (W.step === 3) {
+      initSignature($("#sign"), (data) => { W.signature = data; });
+      $$('input[name="pay"]', form).forEach((r) => r.addEventListener("change", () => { W.pay = r.value; const s = $('button[type="submit"]', form); s.textContent = W.pay === "onsite" ? "Отправить заявку" : "Отправить и оплатить"; }));
+    }
     form.onsubmit = (e) => {
       e.preventDefault(); if (!W) return; readStep();
       const ok = validate(car);
       if (!ok) { rerenderWizard(car); const first = $(".err, .err-msg, .notice.warn", form); if (first) first.scrollIntoView({ block: "center", behavior: "smooth" }); return; }
       if (W.step < 3) { W.step++; rerenderWizard(car); window.scrollTo(0, 0); return; }
       const q = S.quote(car, W.from, W.to, W.extras);
-      const b = S.addBooking({ carId: car.id, from: W.from, to: W.to, extras: W.extras, client: { ...W.client }, docs: { ...W.docs }, signature: W.signature, total: q.total, deposit: q.deposit, mine: true });
-      W = null; location.hash = "done-" + b.id;
+      const save = (payment) => {
+        const b = S.addBooking({ carId: car.id, from: W.from, to: W.to, extras: W.extras, client: { ...W.client }, docs: { ...W.docs }, signature: W.signature, total: q.total, deposit: q.deposit, mine: true, payment });
+        W = null; return b;
+      };
+      if (W.pay === "onsite") { const b = save({ status: "onsite" }); location.hash = "done-" + b.id; return; }
+      let booked = null;
+      const m = RC.pay.open({ amount: q.total, deposit: q.deposit, title: car.brand + " " + car.model + ", " + q.days + " " + U.plural(q.days, "сутки", "суток", "суток") }, (method) => {
+        booked = save({ status: "paid", method, amount: q.total, depositHeld: q.deposit, paidAt: todayIso() });
+      });
+      // после закрытия окна оплаты переходим к результату, если платёж прошёл
+      const obs = new MutationObserver(() => { if (!document.body.contains(m.el)) { obs.disconnect(); if (booked) location.hash = "done-" + booked.id; } });
+      obs.observe(document.body, { childList: true });
     };
   }
   function sampleDoc(title, sub) {
@@ -584,8 +601,9 @@
     const b = S.booking(id); if (!b) return notFound(); const car = S.car(b.carId);
     return `<div class="done-hero">
       <div class="ok-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-      <h1>Заявка отправлена</h1>
-      <p class="lead" style="text-align:center">Бронь <b class="num">${esc(b.id)}</b>: ${esc(car.brand)} ${esc(car.model)}, ${U.fmtDate(b.from)} — ${U.fmtDate(b.to)}. Менеджер проверит документы и подтвердит бронь, обычно за 15 минут. Статус появится в разделе «Мои брони», а уведомление придёт в Max или VK.</p>
+      <h1>${b.payment && b.payment.status === "paid" ? "Оплачено, бронь отправлена" : "Заявка отправлена"}</h1>
+      ${b.payment && b.payment.status === "paid" ? `<span class="pill p-approved">${U.rub(b.payment.amount)} · ${esc(b.payment.method)}</span>` : '<span class="pill p-done">Оплата при получении</span>'}
+      <p class="lead" style="text-align:center">Бронь <b class="num">${esc(b.id)}</b>: ${esc(car.brand)} ${esc(car.model)}, ${U.fmtDate(b.from)} — ${U.fmtDate(b.to)}. Менеджер проверит документы и подтвердит бронь, обычно за 15 минут. После подтверждения страховка на эту машину и твои даты оформится автоматически и появится в «Моих бронях».</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn btn-primary" href="#cabinet">Мои брони</a><a class="btn btn-ghost" href="#admin">Как это видит владелец</a></div>
       <p class="small muted">Это демо: заявка сохранилась только в этом браузере и сразу видна в панели владельца.</p>
     </div>`;
@@ -597,9 +615,9 @@
     return `<div class="page-head"><h1>Условия аренды</h1><p class="lead">Коротко и без мелкого шрифта. Всё это же написано в договоре.</p></div>
     <div class="terms-grid">
       <div class="term"><h3>Кто может взять</h3><ul><li>Возраст от 21 года, стаж от 2 лет</li><li>Премиум: от 25 лет и стаж от 5 лет</li><li>Паспорт РФ и права категории B</li></ul></div>
-      <div class="term"><h3>Залог</h3><div class="big-num"><span class="muted" style="font-size:.55em">от</span> ${U.rub(RC.CLASSES.econom.deposit)}</div><p class="muted">Эконом ${U.rub(RC.CLASSES.econom.deposit)}, комфорт ${U.rub(RC.CLASSES.comfort.deposit)}, премиум ${U.rub(RC.CLASSES.premium.deposit)}. Возвращаем сразу после осмотра. Можно без залога: +25% к цене.</p></div>
+      <div class="term"><h3>Залог и оплата</h3><div class="big-num"><span class="muted" style="font-size:.55em">от</span> ${U.rub(RC.CLASSES.econom.deposit)}</div><p class="muted">Эконом ${U.rub(RC.CLASSES.econom.deposit)}, комфорт ${U.rub(RC.CLASSES.comfort.deposit)}, премиум ${U.rub(RC.CLASSES.premium.deposit)}. Можно без залога: +25% к цене. Оплатить можно онлайн при бронировании (СБП или картой, залог только замораживается) или на месте.</p></div>
       <div class="term"><h3>Пробег и топливо</h3><ul><li>300 км в сутки, премиум 250 км</li><li>Сверх лимита — 5 ₽ за км</li><li>Выдаём с полным баком, так же возвращаешь</li></ul></div>
-      <div class="term"><h3>Что включено</h3><ul><li>ОСАГО, на премиуме ещё КАСКО</li><li>Зимняя резина в сезон</li><li>ТО и шиномонтаж при долгой аренде</li></ul></div>
+      <div class="term"><h3>Что включено</h3><ul><li>Страховка оформляется автоматически на тебя и твои даты</li><li>ОСАГО, на премиуме ещё КАСКО</li><li>Зимняя резина в сезон</li><li>ТО и шиномонтаж при долгой аренде</li></ul></div>
       <div class="term"><h3>Нельзя</h3><ul><li>Курить в салоне — штраф 5 000 ₽</li><li>Передавать руль другому человеку</li><li>Гонки, дрифт, буксировка</li></ul></div>
       <div class="term"><h3>Штрафы и опоздания</h3><ul><li>Штрафы ГИБДД оплачивает арендатор</li><li>Опоздание больше 2 часов — плюс сутки</li><li>Грязная машина — мойка 700 ₽</li></ul></div>
     </div>
@@ -633,13 +651,22 @@
     const mine = S.bookings.filter((b) => b.mine);
     return `<div class="page-head"><h1>Мои брони</h1><p class="lead">Статус заявки, договор и даты в одном месте.</p></div>
     <div class="bk-list">${mine.length ? mine.map((b) => { const car = S.car(b.carId) || { brand: "Машина", model: "удалена", body: "sedan", paint: "#6B7280" };
-      return `<div class="bk"><div class="bimg">${RC.carVisual(car)}</div><div style="display:grid;gap:6px;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><b>${esc(car.brand)} ${esc(car.model)}</b>${RC.statusPill(b.status)}</div>
+      return `<div class="bk"><div class="bimg">${RC.carVisual(car)}</div><div style="display:grid;gap:6px;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><b>${esc(car.brand)} ${esc(car.model)}</b>${RC.statusPill(b.status)}${RC.pay.paymentPill(b)}</div>
         <span class="muted small">${esc(b.id)} · ${U.fmtDate(b.from)} — ${U.fmtDate(b.to)}</span><span class="num">${U.rub(b.total)}${b.deposit ? " + залог " + U.rub(b.deposit) : ""}</span>
         ${b.status === "new" ? '<span class="small muted">Ждёт подтверждения владельца</span>' : b.status === "approved" ? `<span class="small" style="color:var(--go)">Подтверждена. Ждём ${U.fmtDate(b.from)} на Пушкина, 61а</span>` : b.status === "rejected" ? '<span class="small" style="color:var(--stop)">Владелец отклонил заявку. Позвоните, чтобы подобрать другую машину</span>' : ""}</div>
-        <div class="bk-actions"><button class="btn btn-ghost btn-sm" data-contract="${b.id}">Договор</button><a class="btn btn-ghost btn-sm" href="#car-${b.carId}">Машина</a></div></div>`; }).join("") :
+        <div class="bk-actions">${(!b.payment || b.payment.status === "onsite") && ["new", "approved"].includes(b.status) ? `<button class="btn btn-go btn-sm" data-pay="${b.id}">Оплатить онлайн</button>` : ""}<button class="btn btn-ghost btn-sm" data-contract="${b.id}">Договор</button>${b.insurance ? `<button class="btn btn-ghost btn-sm" data-ins="${b.id}">Страховка</button>` : ""}<a class="btn btn-ghost btn-sm" href="#car-${b.carId}">Машина</a></div></div>`; }).join("") :
       `<div class="empty"><h3>Броней пока нет</h3><p class="muted">Выбери машину в каталоге — заявка появится здесь.</p><a class="btn btn-primary" href="#catalog">Открыть каталог</a></div>`}</div>`;
   }
-  function bindCabinet() { $$("[data-contract]").forEach((b) => b.addEventListener("click", () => openContract(b.dataset.contract))); }
+  function bindCabinet() {
+    $$("[data-contract]").forEach((b) => b.addEventListener("click", () => openContract(b.dataset.contract)));
+    $$("[data-ins]").forEach((b) => b.addEventListener("click", () => RC.insurance.open(b.dataset.ins)));
+    $$("[data-pay]").forEach((btn) => btn.addEventListener("click", () => {
+      const b = S.booking(btn.dataset.pay), car = S.car(b.carId);
+      const m = RC.pay.open({ amount: b.total, deposit: b.deposit, title: car.brand + " " + car.model }, (method) => S.setPaid(b.id, method));
+      const obs = new MutationObserver(() => { if (!document.body.contains(m.el)) { obs.disconnect(); route(); } });
+      obs.observe(document.body, { childList: true });
+    }));
+  }
   RC.openContract = function openContract(id) { const b = S.booking(id), car = S.car(b.carId); RC.modal("Договор " + b.id, RC.contractHTML(b, car), "contract-modal"); };
   const openContract = RC.openContract;
 
