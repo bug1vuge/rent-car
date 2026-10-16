@@ -523,7 +523,7 @@
   /* ——— Контакты ——— */
   function viewContacts() {
     const framed = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
-    const map = framed ? schematicMap() : `<iframe src="${B.yandexWidget}" title="Карта: ${esc(B.city)}, ${esc(B.address)}" loading="lazy" allowfullscreen></iframe>`;
+    const map = schematicMap() + (framed ? "" : `<iframe src="${B.yandexWidget}" title="Карта: ${esc(B.city)}, ${esc(B.address)}" allowfullscreen onload="this.classList.add('ready')"></iframe>`);
     return `<div class="wrap page-head"><h1 style="font-size:clamp(2rem,5vw,3.4rem)">Контакты</h1><p class="lead">Машины стоят у Мерседес-центра на Пушкина. Перед приездом лучше позвонить, чтобы машину подготовили.</p></div>
     <div class="wrap contacts">
       <div class="c-list">
@@ -539,19 +539,18 @@
     </div>`;
   }
   function schematicMap() {
-    return `<svg viewBox="0 0 600 420" role="img" aria-label="Схема: ${B.city}, ${B.address}, Мерседес-центр">
-      <rect width="600" height="420" fill="var(--panel)"/>
-      <g stroke="var(--panel-2)" stroke-width="26" stroke-linecap="round" fill="none">
-        <path d="M-20 300 L640 120"/><path d="M120 -20 L220 440"/><path d="M420 -20 L470 440"/><path d="M-20 80 L640 60"/>
-      </g>
-      <g stroke="var(--line)" stroke-width="2" fill="none" stroke-dasharray="10 10"><path d="M-20 300 L640 120"/></g>
-      <g fill="color-mix(in srgb, var(--panel-2) 60%, var(--panel))"><rect x="250" y="250" width="120" height="70" rx="4"/><rect x="40" y="130" width="60" height="90" rx="4"/><rect x="490" y="200" width="90" height="60" rx="4"/><rect x="250" y="80" width="140" height="50" rx="4"/></g>
-      <rect x="300" y="150" width="96" height="50" rx="4" fill="var(--line)"/>
-      <text x="348" y="180" text-anchor="middle" font-size="12" fill="var(--mute)" font-family="Golos Text, sans-serif">Мерседес-центр</text>
-      <text x="80" y="268" font-size="14" fill="var(--mute)" font-family="Golos Text, sans-serif" transform="rotate(-15 80 268)">ул. Пушкина</text>
-      <g transform="translate(348 140)"><path d="M0 0 C-18 -22 -18 -46 0 -50 C18 -46 18 -22 0 0Z" fill="var(--gold)"/><circle cx="0" cy="-32" r="7" fill="var(--gold-ink)"/></g>
-      <text x="348" y="72" text-anchor="middle" font-family="Dela Gothic One, sans-serif" font-size="18" fill="var(--chrome)">Пушкина, 61а</text>
-      <text x="20" y="400" font-size="11" fill="var(--mute)" font-family="Golos Text, sans-serif">Схема. На сайте здесь открывается интерактивная Яндекс Карта.</text>
+    /* Цвета задаются классами из CSS: var() в атрибутах fill/stroke браузеры не понимают */
+    return `<svg class="schema" viewBox="0 0 600 420" role="img" aria-label="Схема проезда: ${B.city}, ${B.address}, Мерседес-центр">
+      <rect class="m-bg" width="600" height="420"/>
+      <g class="m-road"><path d="M-20 300 L640 120"/><path d="M120 -20 L220 440"/><path d="M420 -20 L470 440"/><path d="M-20 80 L640 60"/></g>
+      <path class="m-axis" d="M-20 300 L640 120"/>
+      <g class="m-block"><rect x="250" y="250" width="120" height="70" rx="4"/><rect x="40" y="130" width="60" height="90" rx="4"/><rect x="490" y="200" width="90" height="60" rx="4"/><rect x="250" y="80" width="140" height="50" rx="4"/></g>
+      <rect class="m-target" x="300" y="150" width="96" height="50" rx="4"/>
+      <text class="m-label" x="348" y="180" text-anchor="middle" font-size="12">Мерседес-центр</text>
+      <text class="m-label" x="80" y="268" font-size="14" transform="rotate(-15 80 268)">ул. Пушкина</text>
+      <g transform="translate(348 140)"><path class="m-pin" d="M0 0 C-18 -22 -18 -46 0 -50 C18 -46 18 -22 0 0Z"/><circle class="m-pin-dot" cx="0" cy="-32" r="7"/></g>
+      <text class="m-title" x="348" y="72" text-anchor="middle" font-size="18">Пушкина, 61а</text>
+      <text class="m-label" x="20" y="400" font-size="11">Схема проезда. Точный маршрут — в Яндекс Картах или 2ГИС.</text>
     </svg>`;
   }
 
