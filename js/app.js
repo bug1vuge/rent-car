@@ -389,8 +389,8 @@
       </div>
       <aside class="side-card">
         <div class="row2">
-          <div class="field"><label for="c-from">Забрать</label><input class="input" type="date" id="c-from" value="${from}" min="${todayIso()}"></div>
-          <div class="field"><label for="c-to">Вернуть</label><input class="input" type="date" id="c-to" value="${to}" min="${todayIso()}"></div>
+          <div class="field"><label for="c-from">Забрать</label><input class="input" type="date" id="c-from" data-car="${car.id}" required value="${from}" min="${todayIso()}"></div>
+          <div class="field"><label for="c-to">Вернуть</label><input class="input" type="date" id="c-to" data-car="${car.id}" required value="${to}" min="${todayIso()}"></div>
         </div>
         <table class="tariffs" id="c-tariffs">${RC.TIERS.map((t, i) => `<tr data-tier="${i}"><td>${t.label}</td><td>${car.prices[i].toLocaleString("ru-RU")} ₽ / сутки</td></tr>`).join("")}</table>
         <div id="c-quote"></div>
@@ -455,8 +455,8 @@
     if (W.step === 0) {
       const free = W.to > W.from && S.isFree(car, W.from, W.to);
       return `<h2>Когда едем</h2>
-        <div class="row2"><div class="field"><label for="w-from">Забрать</label><input class="input ${W.errors.dates ? "err" : ""}" type="date" id="w-from" value="${W.from}" min="${todayIso()}"></div>
-        <div class="field"><label for="w-to">Вернуть</label><input class="input ${W.errors.dates ? "err" : ""}" type="date" id="w-to" value="${W.to}" min="${todayIso()}"></div></div>
+        <div class="row2"><div class="field"><label for="w-from">Забрать</label><input class="input ${W.errors.dates ? "err" : ""}" type="date" id="w-from" data-car="${car.id}" required value="${W.from}" min="${todayIso()}"></div>
+        <div class="field"><label for="w-to">Вернуть</label><input class="input ${W.errors.dates ? "err" : ""}" type="date" id="w-to" data-car="${car.id}" required value="${W.to}" min="${todayIso()}"></div></div>
         ${err("dates")}${!W.errors.dates && !free ? `<div class="notice warn">На эти даты машина уже занята. Выбери другие даты или <a href="#catalog">другую машину</a>.</div>` : ""}
         <div class="fgroup"><span class="flabel">Дополнительно</span><div class="opts">${RC.EXTRAS.map((x) => `<label class="opt"><input type="checkbox" name="extra" value="${x.id}" ${W.extras.includes(x.id) ? "checked" : ""}><span class="opt-t">${x.label}<small>${x.note}</small></span><span class="opt-p">${x.per === "pct" ? "+25%" : U.rub(x.price) + (x.per === "day" ? " / сут" : "")}</span></label>`).join("")}</div></div>
         ${nav("Дальше — мои данные")}`;
@@ -466,9 +466,9 @@
         <p class="muted small">Для этой машины: возраст от ${cl.minAge} лет и стаж от ${cl.minExp} ${U.plural(cl.minExp, "года", "лет", "лет")}.</p>
         <div class="field"><label for="w-name">ФИО полностью</label><input class="input ${W.errors.name ? "err" : ""}" id="w-name" autocomplete="name" value="${esc(c.name)}" placeholder="Иванов Иван Иванович">${err("name")}</div>
         <div class="row2"><div class="field"><label for="w-phone">Телефон</label><input class="input ${W.errors.phone ? "err" : ""}" id="w-phone" type="tel" inputmode="tel" autocomplete="tel" value="${esc(c.phone)}" placeholder="+7 913 000-00-00">${err("phone")}</div>
-        <div class="field"><label for="w-birth">Дата рождения</label><input class="input ${W.errors.birth ? "err" : ""}" id="w-birth" type="date" value="${esc(c.birth)}" max="${todayIso()}">${err("birth")}</div></div>
+        <div class="field"><label for="w-birth">Дата рождения</label><input class="input ${W.errors.birth ? "err" : ""}" id="w-birth" type="date" required value="${esc(c.birth)}" max="${todayIso()}">${err("birth")}</div></div>
         <div class="row2"><div class="field"><label for="w-lic">Номер прав</label><input class="input ${W.errors.license ? "err" : ""}" id="w-lic" value="${esc(c.license)}" placeholder="70 12 345678">${err("license")}</div>
-        <div class="field"><label for="w-since">Стаж с (дата в правах)</label><input class="input ${W.errors.licenseSince ? "err" : ""}" id="w-since" type="date" value="${esc(c.licenseSince)}" max="${todayIso()}">${err("licenseSince")}</div></div>
+        <div class="field"><label for="w-since">Стаж с (дата в правах)</label><input class="input ${W.errors.licenseSince ? "err" : ""}" id="w-since" type="date" required value="${esc(c.licenseSince)}" max="${todayIso()}">${err("licenseSince")}</div></div>
         ${nav("Дальше — документы")}`;
     }
     if (W.step === 2) {
