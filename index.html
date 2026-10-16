@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Паша Машины</title>
+<meta name="description" content="Аренда автомобилей в Томске: свободные машины онлайн, бронь за 15 минут, договор с телефона. Пушкина, 61а.">
+<meta name="theme-color" content="#0F1218">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/dela-gothic-one-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/golos-text-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="offline-bar" id="offline" hidden>Нет интернета. Показываем сохранённый каталог — бронь отправится, когда связь вернётся.</div>
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#" aria-label="Паша Машины, на главную"><span class="logo-mark" aria-hidden="true">ПМ</span><span class="logo-text">Паша <span>Машины</span></span></a>
+    <nav class="nav" aria-label="Основное меню">
+      <a href="#catalog" data-route="catalog">Автопарк</a>
+      <a href="#terms" data-route="terms">Условия</a>
+      <a href="#contacts" data-route="contacts">Контакты</a>
+    </nav>
+    <div class="top-right">
+      <a class="btn btn-ghost btn-sm cab-link" href="#cabinet" data-route="cabinet">Мои брони</a>
+      <a class="phone-link" href="tel:+73822342424">34-24-24<small>Томск, звонок</small></a>
+    </div>
+  </div>
+</header>
+
+<main id="app" tabindex="-1"></main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>Паша Машины · аренда авто в Томске · Пушкина, 61а</span>
+    <span>Демо-версия: данные хранятся только в этом браузере. <button type="button" id="reset-demo">Сбросить демо</button> · <a href="#admin">Вход для владельца</a></span>
+  </div>
+</footer>
+
+<nav class="tabbar" id="tabbar" aria-label="Навигация"></nav>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/app.js"></script>
+<script>
+  /* Офлайн-кэш: повторные открытия грузятся мгновенно, каталог доступен без сети */
+  (function () {
+    var framed; try { framed = window.self !== window.top; } catch (e) { framed = true; }
+    if (!framed && "serviceWorker" in navigator && location.protocol === "https:") {
+      window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+    }
+  })();
+</script>
+</body>
+</html>
