@@ -674,6 +674,7 @@
   /* Сеть: показываем, что каталог открыт из сохранённой копии */
   const net = () => { $("#offline").hidden = navigator.onLine; const n = $("#sb-net"); n.classList.toggle("off", !navigator.onLine); n.textContent = navigator.onLine ? "В сети" : "Без сети"; };
   window.addEventListener("online", net); window.addEventListener("offline", net); net();
+  $("#replay-intro").addEventListener("click", () => { window.scrollTo(0, 0); RC.playIntro(); });
   $("#reset-demo").addEventListener("click", () => { S.reset(); W = null; RC.toast("Демо-данные сброшены"); route(); });
 
   route();

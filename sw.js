@@ -1,10 +1,10 @@
 /* Кэш для мгновенной загрузки и работы без сети.
    При изменении файлов увеличьте номер версии. */
-const VERSION = "pm-v2";
+const VERSION = "rc-v3";
 const ASSETS = [
   "./", "index.html", "manifest.webmanifest",
-  "css/tokens.css", "css/base.css", "css/shell.css", "css/home.css", "css/pages.css", "css/admin.css",
-  "js/data.js", "js/store.js", "js/admin.js", "js/assistant.js", "js/app.js",
+  "css/tokens.css", "css/base.css", "css/shell.css", "css/home.css", "css/pages.css", "css/admin.css", "css/intro.css",
+  "js/data.js", "js/store.js", "js/admin.js", "js/intro.js", "js/silhouette.js", "js/assistant.js", "js/app.js",
   "img/cut-granta.webp", "img/cut-changan.webp", "img/cut-bora.webp", "img/cut-premium.webp",
   "img/granta.webp", "img/changan.webp", "img/bora.webp", "img/premium.webp", "img/icon.svg",
   "fonts/onest-cyrillic-wght-normal.woff2", "fonts/onest-latin-wght-normal.woff2"
