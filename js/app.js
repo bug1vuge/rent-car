@@ -597,7 +597,7 @@
     return `<div class="page-head"><h1>Условия аренды</h1><p class="lead">Коротко и без мелкого шрифта. Всё это же написано в договоре.</p></div>
     <div class="terms-grid">
       <div class="term"><h3>Кто может взять</h3><ul><li>Возраст от 21 года, стаж от 2 лет</li><li>Премиум: от 25 лет и стаж от 5 лет</li><li>Паспорт РФ и права категории B</li></ul></div>
-      <div class="term"><h3>Залог</h3><div class="big-num">${U.rub(RC.CLASSES.econom.deposit)} – ${U.rub(RC.CLASSES.premium.deposit)}</div><p class="muted">Эконом ${U.rub(RC.CLASSES.econom.deposit)}, комфорт ${U.rub(RC.CLASSES.comfort.deposit)}, премиум ${U.rub(RC.CLASSES.premium.deposit)}. Возвращаем сразу после осмотра. Можно без залога: +25% к цене.</p></div>
+      <div class="term"><h3>Залог</h3><div class="big-num"><span class="muted" style="font-size:.55em">от</span> ${U.rub(RC.CLASSES.econom.deposit)}</div><p class="muted">Эконом ${U.rub(RC.CLASSES.econom.deposit)}, комфорт ${U.rub(RC.CLASSES.comfort.deposit)}, премиум ${U.rub(RC.CLASSES.premium.deposit)}. Возвращаем сразу после осмотра. Можно без залога: +25% к цене.</p></div>
       <div class="term"><h3>Пробег и топливо</h3><ul><li>300 км в сутки, премиум 250 км</li><li>Сверх лимита — 5 ₽ за км</li><li>Выдаём с полным баком, так же возвращаешь</li></ul></div>
       <div class="term"><h3>Что включено</h3><ul><li>ОСАГО, на премиуме ещё КАСКО</li><li>Зимняя резина в сезон</li><li>ТО и шиномонтаж при долгой аренде</li></ul></div>
       <div class="term"><h3>Нельзя</h3><ul><li>Курить в салоне — штраф 5 000 ₽</li><li>Передавать руль другому человеку</li><li>Гонки, дрифт, буксировка</li></ul></div>
