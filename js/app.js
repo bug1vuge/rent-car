@@ -100,11 +100,11 @@
   function carCard(car) {
     const st = carStatus(car);
     return `<a class="car" href="#car-${car.id}">
-      <div class="car-img"><img src="${car.img}" alt="${esc(car.brand + " " + car.model)}" loading="lazy" width="545" height="192"><span class="status st-${st.key}">${esc(st.label)}</span></div>
+      <div class="car-img">${car.cut ? `<img src="${car.cut}" alt="${esc(car.brand + " " + car.model)}" loading="lazy">` : `<img class="photo" src="${car.img}" alt="${esc(car.brand + " " + car.model)}" loading="lazy">`}<span class="status st-${st.key}">${esc(st.label)}</span></div>
       <div class="car-body">
         <div class="car-title"><h3>${esc(car.brand)} ${esc(car.model)}</h3><span class="year">${car.year}</span></div>
-        <div class="specs"><span class="spec">${clsLabel(car.cls)}</span><span class="spec">${esc(car.kpp)}</span>${car.fuel !== "Бензин" ? `<span class="spec gold">${esc(car.fuel)}</span>` : `<span class="spec">${esc(car.fuel)}</span>`}${car.taxi ? '<span class="spec">Под такси</span>' : ""}</div>
-        <div class="car-foot"><div class="price"><small>от</small><b>${car.prices[3].toLocaleString("ru-RU")} ₽</b><br><span>до ${car.prices[0].toLocaleString("ru-RU")} ₽ за сутки</span></div><span class="btn btn-gold btn-sm">Выбрать</span></div>
+        <div class="specs"><span class="spec">${clsLabel(car.cls)}</span><span class="spec">${esc(car.kpp)}</span>${car.fuel !== "Бензин" ? `<span class="spec accent">${esc(car.fuel)}</span>` : `<span class="spec">${esc(car.fuel)}</span>`}${car.taxi ? '<span class="spec">Под такси</span>' : ""}</div>
+        <div class="car-foot"><div class="price"><small>от</small><b>${car.prices[3].toLocaleString("ru-RU")} ₽</b><br><span>до ${car.prices[0].toLocaleString("ru-RU")} ₽ за сутки</span></div><span class="btn btn-primary btn-sm">Выбрать</span></div>
       </div></a>`;
   }
   function filtered() {
@@ -126,80 +126,156 @@
     pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>',
     user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>'
   };
-  $("#tabbar").innerHTML = [["", "Главная", I.home], ["catalog", "Машины", I.car], ["terms", "Условия", I.doc], ["contacts", "Контакты", I.pin], ["cabinet", "Брони", I.user]]
-    .map(([h, l, i]) => `<a href="#${h}" data-route="${h || "home"}">${i}<span>${l}</span></a>`).join("");
+  I.cal = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
+  I.key = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg>';
+  $("#rail-nav").innerHTML = [["", "Главная", I.home], ["catalog", "Машины", I.car], ["cabinet", "Брони", I.cal], ["terms", "Условия", I.doc], ["contacts", "Контакты", I.pin], ["admin", "Владелец", I.key, "rail-extra"]]
+    .map(([h, l, i, cls]) => `<a href="#${h}" data-route="${h || "home"}" class="${cls || ""}">${i}<span>${l}</span></a>`).join("");
 
-  /* ——— Главная ——— */
+  /* ——— Главная: дашборд ——— */
+  const H = { cls: "comfort", id: null };
+  const carImg = (car, cls = "") => car.cut ? `<img src="${car.cut}" alt="${esc(car.brand + " " + car.model)}" class="${cls}">` : `<img src="${car.img}" alt="${esc(car.brand + " " + car.model)}" class="photo ${cls}">`;
+  const freeRank = (c) => (datesSet() && S.isFree(c, F.from, F.to) ? 0 : 1) + (S.liveStatus(c).key === "free" ? 0 : 1);
+  const classCars = (cls) => S.visibleCars().filter((c) => c.cls === cls).sort((a, b) => freeRank(a) - freeRank(b) || a.prices[0] - b.prices[0]);
+  const stageCar = () => {
+    let list = classCars(H.cls);
+    if (!list.length) { H.cls = Object.keys(PM.CLASSES).find((k) => classCars(k).length) || "econom"; list = classCars(H.cls); }
+    let car = list.find((c) => c.id === H.id); if (!car) { car = list[0]; H.id = car && car.id; }
+    return car;
+  };
+  const stageStep = (n) => { const list = classCars(H.cls); const i = list.findIndex((c) => c.id === H.id); H.id = list[(i + n + list.length) % list.length].id; };
+  const ensureDates = () => { if (!datesSet() || F.from < todayIso()) { F.from = U.iso(U.addDays(U.today(), 1)); F.to = U.iso(U.addDays(U.today(), 4)); saveF(); } };
+  PM.home = {
+    car: stageCar,
+    dates: () => { ensureDates(); return { from: F.from, to: F.to }; },
+    setDates(from, to) { F.from = from; F.to = to; saveF(); if (location.hash.replace("#", "") === "") { renderDates(); renderStage(); } },
+    setClass(cls) { H.cls = cls; H.id = null; if (!location.hash.slice(1)) { renderStage(true); renderDates(); } },
+    filtersFor(patch) { Object.assign(F, patch); saveF(); }
+  };
+
+  PM.navmapSVG = function () {
+    return `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect class="nm-bg" width="400" height="300"/>
+      <g class="nm-block"><rect x="20" y="20" width="90" height="60" rx="8"/><rect x="140" y="14" width="110" height="52" rx="8"/><rect x="280" y="30" width="100" height="70" rx="8"/><rect x="18" y="120" width="70" height="90" rx="8"/><rect x="130" y="196" width="100" height="80" rx="8"/><rect x="292" y="190" width="96" height="92" rx="8"/><rect x="120" y="96" width="70" height="56" rx="8"/></g>
+      <g class="nm-road"><path d="M-10 104 L410 92" stroke-width="16"/><path d="M-10 178 L410 160" stroke-width="20"/><path d="M118 -10 L104 310" stroke-width="14"/><path d="M262 -10 L282 310" stroke-width="16"/><path d="M190 160 L210 310" stroke-width="10"/></g>
+      <path class="nm-route" d="M60 260 L60 178 L264 166 L270 128"/>
+      <path class="nm-route-dash" d="M60 260 L60 178 L264 166 L270 128"/>
+      <circle class="nm-me" cx="60" cy="262" r="8"/>
+      <circle class="nm-pulse" cx="270" cy="118" r="30"/>
+      <g transform="translate(270 124)"><path class="nm-pin" d="M0 0 C-14 -16 -14 -36 0 -38 C14 -36 14 -16 0 0Z"/><circle class="nm-pin-dot" cx="0" cy="-25" r="6"/></g>
+      <text class="nm-label" x="300" y="152">Мерседес-центр</text>
+      <text class="nm-label" x="150" y="190" transform="rotate(-3 150 190)">ул. Пушкина</text>
+    </svg>`;
+  };
+  const ICO = {
+    spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>',
+    left: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>',
+    right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>',
+    arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h15M14 6l6 6-6 6"/></svg>',
+    out: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4h6v6M20 4l-8 8M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+    seat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="3.5"/><path d="M5 20c1-4 3.5-6 7-6s6 2 7 6"/></svg>',
+    gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4v16M12 4v16M18 4v8M6 12h12"/></svg>',
+    turn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 20v-7a3 3 0 0 1 3-3h8M14 6l4 4-4 4"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
+    bolt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></svg>'
+  };
+
   function viewHome() {
+    ensureDates();
     const cars = S.visibleCars();
     const freeNow = cars.filter((c) => S.liveStatus(c).key === "free").length;
     const minPrice = Math.min(...cars.map((c) => c.prices[3]));
-    const tomorrow = U.iso(U.addDays(U.today(), 1)), after = U.iso(U.addDays(U.today(), 3));
-    const featured = ["changan-1", "bora-1", "hongqi-1", "granta-1"].map(S.car).filter(Boolean);
-    return `
-    <section class="hero"><div class="wrap">
-      <div class="hero-grid">
-        <div>
-          <h1><span>Тачка</span><span class="l2">за 15 минут</span></h1>
-          <p class="lead">Выбираешь свободную машину, загружаешь права и подписываешь договор с телефона. Приезжаешь на Пушкина, 61а и забираешь ключи. Без переписки в директе.</p>
-          <form class="quick" id="quick">
-            <div class="field"><label for="q-from">Забрать</label><input class="input" type="date" id="q-from" value="${F.from || tomorrow}" min="${todayIso()}"></div>
-            <div class="field"><label for="q-to">Вернуть</label><input class="input" type="date" id="q-to" value="${F.to || after}" min="${tomorrow}"></div>
-            <div class="field"><label for="q-cls">Класс</label><select class="input" id="q-cls"><option value="">Любой</option>${Object.entries(PM.CLASSES).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("")}</select></div>
-            <button class="btn btn-gold" type="submit">Найти свободные</button>
-          </form>
+    const recs = ["changan-1", "bora-1", "hongqi-1", "granta-1"].map(S.car).filter((c) => c && c.status !== "hidden").slice(0, 3);
+    return `<div class="dash">
+      <section class="tile stage" aria-label="Машина на сцене" id="stage"></section>
+      <section class="tile assistant" aria-label="Помощник" id="assistant">${PM.assistant.html()}</section>
+      <div class="stats">
+        <div class="tile stat">${I.car}<div><div class="big-num">${freeNow}<span class="muted" style="font-size:.55em"> из ${cars.length}</span></div><p>машин свободно сейчас</p></div></div>
+        <div class="tile stat">${ICO.bolt}<div><div class="big-num">15<span class="muted" style="font-size:.55em"> мин</span></div><p>от заявки до ключей</p></div></div>
+        <div class="tile stat">${ICO.shield}<div><div class="big-num">${minPrice.toLocaleString("ru-RU")}<span class="muted" style="font-size:.55em"> ₽</span></div><p>минимум за сутки, ОСАГО включено</p></div></div>
+      </div>
+      <section class="tile w-map">
+        <div class="tile-head"><div><h3>Место выдачи</h3><p>${esc(B.address)} · ${esc(B.place.split(",")[0])}</p></div><a class="tile-link" href="#contacts" aria-label="Открыть контакты">${ICO.right}</a></div>
+        <div class="navmap"><div class="nm-turn"><i>${ICO.turn}</i><span><b>Пушкина, 61а</b>парковка у шоурума</span></div>${PM.navmapSVG()}</div>
+      </section>
+      <section class="tile w-dates" id="w-dates"></section>
+      <section class="tile w-pay">
+        <div class="tile-head"><div><h3>Оплата</h3><p>При получении машины</p></div></div>
+        <div class="paycard">
+          <div class="pc-row"><small>Залог возвращаем после осмотра</small><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".7"><path d="M8.5 8.5a5 5 0 0 1 0 7M12 6a8.5 8.5 0 0 1 0 12M15.5 3.5a12 12 0 0 1 0 17"/></svg></div>
+          <div class="pc-row"><div class="pc-ways"><span>Карта</span><span>СБП</span><span>Наличные</span></div></div>
+          <div class="pc-row col"><b id="pay-deposit"></b><small>Онлайн-предоплата появится в полной версии</small></div>
         </div>
-        <div class="hero-photo">
-          <div class="frame"><img src="img/premium.webp" alt="Три чёрных седана Hongqi H5 у Мерседес-центра" width="545" height="192" fetchpriority="high"></div>
-          <div class="stripe"></div>
-          <div class="price-tag">от <b class="num">${minPrice.toLocaleString("ru-RU")} ₽</b> в сутки</div>
-        </div>
-      </div>
-      <div class="live">
-        <span class="live-dot" aria-hidden="true"></span>
-        <span>Свободно сейчас: <b>${freeNow} из ${cars.length}</b> машин</span>
-        <span class="muted">Обновляется автоматически, когда машину забирают или возвращают</span>
-      </div>
-    </div></section>
-
-    <section class="section"><div class="wrap">
-      <div class="section-head"><h2>В наличии</h2><a class="btn btn-ghost btn-sm" href="#catalog">Весь автопарк</a></div>
-      <div class="grid-cars">${featured.map(carCard).join("")}</div>
-    </div></section>
-
-    <section class="section"><div class="wrap">
-      <div class="section-head"><h2>Как взять машину</h2></div>
-      <div class="steps">
-        <div class="step"><h3>Выбери машину и даты</h3><p>В каталоге видно, какие машины свободны на твои даты, и сразу считается цена.</p></div>
-        <div class="step"><h3>Загрузи документы</h3><p>Фото паспорта и прав прямо с телефона. Проверяем за 15 минут.</p></div>
-        <div class="step"><h3>Подпиши договор</h3><p>Договор собирается автоматически, подпись пальцем на экране.</p></div>
-        <div class="step"><h3>Забери ключи</h3><p>Пушкина, 61а, у Мерседес-центра. Полный бак, зимняя резина, ОСАГО.</p></div>
-      </div>
-    </div></section>
-
-    <section class="section"><div class="wrap">
-      <div class="taxi">
-        <div>
-          <h2>Работаешь в такси?</h2>
-          <p class="lead" style="margin-top:12px">Granta, Bora и Changan можно брать под работу от 7 суток. Чем дольше срок, тем ниже цена за сутки.</p>
-          <ul>
-            <li>Bora на газу: километр в 2–3 раза дешевле бензина</li>
-            <li>От 14 суток — Granta за ${S.car("granta-2") ? S.car("granta-2").prices[3].toLocaleString("ru-RU") : "1 500"} ₽ в сутки</li>
-            <li>ТО и шиномонтаж за наш счёт</li>
-          </ul>
-        </div>
-        <div style="display:grid;gap:10px"><button class="btn btn-gold" data-taxi>Показать машины под такси</button><a class="btn btn-ghost" href="#terms">Тарифы и условия</a></div>
-      </div>
-    </div></section>`;
+        <button class="btn btn-go btn-block" style="margin-top:14px" data-book-stage>Забронировать</button>
+        <div class="secure">${ICO.lock}Документы видит только владелец</div>
+      </section>
+      <section class="tile recs">
+        <div class="tile-head"><div><h3>Рекомендуем</h3><p>Свободны на ближайшие дни</p></div><a class="tile-link" href="#catalog" aria-label="Весь автопарк">${ICO.right}</a></div>
+        <div class="recs-grid">${recs.map((c) => `<a class="mini" href="#car-${c.id}"><div class="mimg">${carImg(c)}</div><h3>${esc(c.brand)} ${esc(c.model)}</h3><div class="meta"><span>${ICO.seat}${c.seats}</span><span>${ICO.gear}${esc(c.kpp)}</span><span>${clsLabel(c.cls)}</span></div><div class="pr"><b>от ${c.prices[3].toLocaleString("ru-RU")} ₽</b> <span>/ сутки</span></div></a>`).join("")}</div>
+      </section>
+      <section class="tile promo">
+        <div><h2>Работаешь в такси?</h2><p>Granta, Bora и Changan от 7 суток. Bora на газу — километр в 2–3 раза дешевле.</p></div>
+        ${S.car("bora-1") ? `<img src="${S.car("bora-1").cut}" alt="">` : ""}
+        <button class="btn" data-taxi>Машины под такси</button>
+      </section>
+    </div>`;
   }
+
+  function renderStage(animate) {
+    const el = $("#stage"); if (!el) return;
+    const car = stageCar(); const list = classCars(H.cls); const cur = list.indexOf(car);
+    const keys = Object.keys(PM.CLASSES); const ci = keys.indexOf(H.cls);
+    const st = S.liveStatus(car);
+    el.innerHTML = `
+      <div class="stage-top">
+        <div><h1>${esc(car.brand)} ${esc(car.model)}</h1><p>${car.year} · ${esc(car.engine)} · ${esc(car.kpp)} · ${esc(car.fuel.toLowerCase())}</p></div>
+        <span class="status st-${st.key}">${esc(st.label)}</span>
+      </div>
+      <div class="drive" role="group" aria-label="Класс машины">
+        <span class="thumb" style="width:calc((100% - 8px) / ${keys.length});transform:translateX(${ci * 100}%)"></span>
+        ${keys.map((k) => { const cl = classCars(k); const from = cl.length ? Math.min(...cl.map((c) => c.prices[3])) : 0; return `<button type="button" data-drive="${k}" aria-pressed="${k === H.cls}"><b>${PM.CLASSES[k].label}</b><small>${cl.length ? "от " + from.toLocaleString("ru-RU") + " ₽" : "нет"}</small></button>`; }).join("")}
+      </div>
+      <div class="stage-car ${animate ? "swap" : ""}">${carImg(car)}</div>
+      <div class="stage-bottom">
+        <div class="stage-nav">
+          <button class="round" data-stage="-1" aria-label="Предыдущая машина" ${list.length < 2 ? "disabled" : ""}>${ICO.left}</button>
+          <div class="dots" aria-hidden="true">${list.map((_, i) => `<i class="${i === cur ? "on" : ""}"></i>`).join("")}</div>
+          <button class="round" data-stage="1" aria-label="Следующая машина" ${list.length < 2 ? "disabled" : ""}>${ICO.right}</button>
+        </div>
+        <div class="spec-row">${car.features.slice(0, 3).map((f) => `<span class="spec">${esc(f)}</span>`).join("")}</div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div class="stage-price"><b class="big-num">${car.prices[0].toLocaleString("ru-RU")} ₽</b> <span>/ сутки</span></div>
+          <a class="btn btn-primary" href="#car-${car.id}">Подробнее и бронь</a>
+        </div>
+      </div>`;
+    $$("[data-drive]", el).forEach((b) => b.addEventListener("click", () => { if (H.cls === b.dataset.drive) return; H.cls = b.dataset.drive; H.id = null; renderStage(true); renderDates(); }));
+    $$("[data-stage]", el).forEach((b) => b.addEventListener("click", () => { stageStep(+b.dataset.stage); renderStage(true); renderDates(); }));
+    const dep = $("#pay-deposit"); if (dep) dep.textContent = "Залог " + U.rub(PM.CLASSES[car.cls].deposit);
+  }
+
+  function renderDates() {
+    const el = $("#w-dates"); if (!el) return; ensureDates();
+    const car = stageCar(); const q = S.quote(car, F.from, F.to, []); const free = S.isFree(car, F.from, F.to);
+    const box = (iso, key, lbl) => { const d = U.parse(iso); return `<div class="dbox"><span class="lbl">${lbl}</span><span class="big-num">${d.getDate()}</span><span class="mon">${d.toLocaleDateString("ru-RU", { month: "short", weekday: "short" })}</span>
+      <div class="dstep"><button type="button" data-step="${key}|-1" aria-label="${lbl}: на день раньше">${ICO.left}</button><button type="button" data-step="${key}|1" aria-label="${lbl}: на день позже">${ICO.right}</button></div></div>`; };
+    el.innerHTML = `<div class="tile-head"><div><h3>Мои даты</h3><p>${q.days} ${U.plural(q.days, "сутки", "суток", "суток")} · ${esc(car.brand)} ${esc(car.model)}</p></div><a class="tile-link" href="#catalog" aria-label="Все свободные на эти даты">${ICO.out}</a></div>
+      <div class="dates">${box(F.from, "from", "Забрать")}<svg class="darrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h15M14 6l6 6-6 6"/></svg>${box(F.to, "to", "Вернуть")}</div>
+      <div class="divider"></div>
+      <div class="dmeta"><div class="t">${ICO.clock}<div><b>10:00</b><span>время выдачи</span></div></div>
+        <div style="text-align:right"><b class="num" style="font-size:1.2rem">${U.rub(q.base)}</b><div class="small ${free ? "st-free" : "st-busy"}">${free ? "Машина свободна" : "На эти даты занята"}</div></div></div>`;
+    $$("[data-step]", el).forEach((b) => b.addEventListener("click", () => {
+      const [k, n] = b.dataset.step.split("|"); let from = U.parse(F.from), to = U.parse(F.to);
+      if (k === "from") { from = U.addDays(from, +n); if (from < U.today()) return; if (to <= from) to = U.addDays(from, 1); }
+      else { to = U.addDays(to, +n); if (to <= from) return; }
+      F.from = U.iso(from); F.to = U.iso(to); saveF(); renderDates();
+    }));
+  }
+
   function bindHome() {
-    $("#quick").addEventListener("submit", (e) => {
-      e.preventDefault();
-      F.from = $("#q-from").value; F.to = $("#q-to").value; F.cls = $("#q-cls").value ? [$("#q-cls").value] : [];
-      if (F.to <= F.from) { PM.toast("Дата возврата должна быть позже даты получения"); return; }
-      saveF(); location.hash = "catalog";
-    });
+    renderStage(); renderDates(); PM.assistant.bind($("#assistant"));
     $("[data-taxi]").addEventListener("click", () => { F.taxi = true; F.cls = []; saveF(); location.hash = "catalog"; });
+    $("[data-book-stage]").addEventListener("click", () => { const car = stageCar(); W = newWizard(car.id); location.hash = "book-" + car.id; });
   }
 
   /* ——— Каталог ——— */
@@ -207,8 +283,8 @@
     const mp = maxPrice(); const price = Math.min(F.price, mp);
     const chip = (group, val, label, on) => `<button class="chip" type="button" data-${group}="${val}" aria-pressed="${on}">${label}</button>`;
     return `
-    <div class="wrap page-head"><h1 style="font-size:clamp(2rem,5vw,3.4rem)">Автопарк</h1><p class="lead">Все машины с полным баком, зимней резиной и ОСАГО. Укажи даты, и останутся только свободные.</p></div>
-    <div class="wrap catalog">
+    <div class="page-head"><h1>Автопарк</h1><p class="lead">Все машины с полным баком, зимней резиной и ОСАГО. Укажи даты, и останутся только свободные.</p></div>
+    <div class="catalog">
       <div>
         <button class="btn btn-ghost btn-block filters-toggle" id="ftoggle" aria-expanded="false" aria-controls="filters">Фильтры и даты</button>
         <aside class="filters collapsed" id="filters">
@@ -228,7 +304,7 @@
       <div style="min-width:0">
         <div class="results-bar"><span id="count" class="muted"></span>
           <label class="field" style="grid-auto-flow:column;align-items:center;gap:8px"><span class="small muted">Сортировка</span>
-            <select class="input" id="f-sort" style="min-height:38px;padding:6px 10px"><option value="price">Сначала дешевле</option><option value="price-desc">Сначала дороже</option><option value="year">Сначала новее</option></select></label>
+            <select class="input" id="f-sort" style="min-height:40px;padding:6px 34px 6px 14px;width:auto;min-width:190px"><option value="price">Сначала дешевле</option><option value="price-desc">Сначала дороже</option><option value="year">Сначала новее</option></select></label>
         </div>
         <div id="results"></div>
       </div>
@@ -238,7 +314,7 @@
     const list = filtered();
     $("#count").textContent = list.length ? `Найдено ${list.length} ${U.plural(list.length, "машина", "машины", "машин")}${datesSet() ? " · " + U.fmtDate(F.from, { day: "numeric", month: "short" }) + " – " + U.fmtDate(F.to, { day: "numeric", month: "short" }) : ""}` : "";
     $("#results").innerHTML = list.length ? `<div class="grid-cars">${list.map(carCard).join("")}</div>` :
-      `<div class="empty"><h3>На эти условия свободных машин нет</h3><p class="muted">Сдвинь даты на день-два или убери часть фильтров. Можно позвонить: ${B.phoneShort} — подскажем, что освободится.</p><button class="btn btn-gold" id="empty-reset">Сбросить фильтры</button></div>`;
+      `<div class="empty"><h3>На эти условия свободных машин нет</h3><p class="muted">Сдвинь даты на день-два или убери часть фильтров. Можно позвонить: ${B.phoneShort} — подскажем, что освободится.</p><button class="btn btn-primary" id="empty-reset">Сбросить фильтры</button></div>`;
     const er = $("#empty-reset"); if (er) er.addEventListener("click", resetFilters);
   }
   function resetFilters() { F = { cls: [], kpp: "any", fuel: "any", taxi: false, price: Infinity, from: "", to: "", onlyFree: true, sort: F.sort }; saveF(); route(); }
@@ -269,33 +345,34 @@
       const isBusy = car.status === "service" || busy.some((b) => U.overlap(s, s1, b.from, b.to));
       h += `<div class="cal-day ${isBusy ? "busy" : ""} ${s === todayIso() ? "today" : ""}" style="${past ? "opacity:.3" : ""}" title="${U.fmtDate(s)}${isBusy ? " — занята" : " — свободна"}">${d.getDate()}</div>`;
     }
-    return `<div class="calendar">${h}</div><div class="legend"><span><i style="background:color-mix(in srgb,var(--go) 30%,var(--panel))"></i>Свободна</span><span><i style="background:color-mix(in srgb,var(--stop) 40%,var(--panel))"></i>Занята</span></div>`;
+    return `<div class="calendar">${h}</div><div class="legend"><span><i style="background:var(--go-soft);box-shadow:inset 0 0 0 1px var(--go)"></i>Свободна</span><span><i style="background:var(--stop-soft);box-shadow:inset 0 0 0 1px var(--stop)"></i>Занята</span></div>`;
   }
   function viewCar(id) {
     const car = S.car(id); if (!car) return notFound();
     const cl = PM.CLASSES[car.cls];
     const from = F.from || U.iso(U.addDays(U.today(), 1)), to = F.to && F.to > from ? F.to : U.iso(U.addDays(U.parse(from), 3));
     return `
-    <div class="wrap crumbs"><a href="#catalog">Автопарк</a> / ${esc(car.brand)} ${esc(car.model)}</div>
-    <div class="wrap car-page">
-      <div style="min-width:0">
-        <div class="car-hero-img"><img src="${car.img}" alt="${esc(car.brand + " " + car.model)}" width="545" height="192"></div>
-        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:end;margin-top:22px">
-          <h1 style="font-size:clamp(2rem,5vw,3.2rem)">${esc(car.brand)} ${esc(car.model)}</h1>
-          <span class="status st-${S.liveStatus(car).key}" style="position:static">${esc(S.liveStatus(car).label)}</span>
-        </div>
-        <dl class="spec-table">
+    <div class="crumbs"><a href="#catalog">Автопарк</a> / ${esc(car.brand)} ${esc(car.model)}</div>
+    <div class="car-page">
+      <div class="car-info">
+        <section class="tile car-stage">
+          <div class="head"><div><h1>${esc(car.brand)} ${esc(car.model)}</h1><p class="muted" style="margin-top:6px">${car.year} · ${cl.label} · ${esc(car.engine)}</p></div>
+          <span class="status st-${S.liveStatus(car).key}">${esc(S.liveStatus(car).label)}</span></div>
+          <div class="stage-car">${car.cut ? `<img src="${car.cut}" alt="${esc(car.brand + " " + car.model)}">` : `<img src="${car.img}" alt="${esc(car.brand + " " + car.model)}" style="border-radius:16px">`}</div>
+        </section>
+        <section class="tile"><dl class="spec-table">
           <div><dt>Год</dt><dd>${car.year}</dd></div><div><dt>Класс</dt><dd>${cl.label}</dd></div>
           <div><dt>Коробка</dt><dd>${esc(car.kpp)}</dd></div><div><dt>Двигатель</dt><dd>${esc(car.engine)}</dd></div>
           <div><dt>Топливо</dt><dd>${esc(car.fuel)}</dd></div><div><dt>Расход</dt><dd>${esc(car.cons)}</dd></div>
           <div><dt>Мест</dt><dd>${car.seats}</dd></div><div><dt>Цвет</dt><dd>${esc(car.color)}</dd></div>
-        </dl>
-        <h3 style="margin-top:28px">Что есть в машине</h3>
-        <ul class="feat">${car.features.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
-        <h3 style="margin-top:28px">Требования к водителю</h3>
-        <p class="muted" style="margin-top:8px">Возраст от ${cl.minAge} лет, стаж от ${cl.minExp} ${U.plural(cl.minExp, "года", "лет", "лет")}. Залог ${U.rub(cl.deposit)}, возвращается после осмотра. Лимит ${cl.mileage} км в сутки.</p>
-        <h3 style="margin-top:28px">Занятость на 4 недели</h3>
-        <div style="max-width:420px;margin-top:12px;display:grid;gap:10px">${calendarHTML(car)}</div>
+        </dl></section>
+        <section class="tile" style="display:grid;gap:14px"><h3>Что есть в машине</h3>
+        <ul class="feat">${car.features.map((f) => `<li>${esc(f)}</li>`).join("")}</ul></section>
+        <section class="tile" style="display:grid;gap:8px"><h3>Требования к водителю</h3>
+        <p class="muted">Возраст от ${cl.minAge} лет, стаж от ${cl.minExp} ${U.plural(cl.minExp, "года", "лет", "лет")}. Залог ${U.rub(cl.deposit)}, возвращается после осмотра. Лимит ${cl.mileage} км в сутки.</p>
+        </section>
+        <section class="tile" style="display:grid;gap:12px"><h3>Занятость на 4 недели</h3>
+        <div style="max-width:440px;display:grid;gap:10px">${calendarHTML(car)}</div></section>
       </div>
       <aside class="side-card">
         <div class="row2">
@@ -304,7 +381,7 @@
         </div>
         <table class="tariffs" id="c-tariffs">${PM.TIERS.map((t, i) => `<tr data-tier="${i}"><td>${t.label}</td><td>${car.prices[i].toLocaleString("ru-RU")} ₽ / сутки</td></tr>`).join("")}</table>
         <div id="c-quote"></div>
-        <button class="btn btn-gold btn-block" id="c-book">Забронировать</button>
+        <button class="btn btn-primary btn-block" id="c-book">Забронировать</button>
         <p class="small muted">Бронь бесплатная. Оплата и залог — при получении машины.</p>
       </aside>
     </div>`;
@@ -341,8 +418,8 @@
     if (!W || W.carId !== id) W = newWizard(id);
     if (!W.from || !W.to || W.to <= W.from) { W.from = U.iso(U.addDays(U.today(), 1)); W.to = U.iso(U.addDays(U.today(), 4)); }
     return `
-    <div class="wrap crumbs"><a href="#catalog">Автопарк</a> / <a href="#car-${car.id}">${esc(car.brand)} ${esc(car.model)}</a> / Бронирование</div>
-    <div class="wrap wizard">
+    <div class="crumbs"><a href="#catalog">Автопарк</a> / <a href="#car-${car.id}">${esc(car.brand)} ${esc(car.model)}</a> / Бронирование</div>
+    <div class="wizard">
       <div style="min-width:0">
         <ol class="progress">${STEPS.map((s, i) => `<li class="${i < W.step ? "done" : i === W.step ? "cur" : ""}">${i + 1}. ${s}</li>`).join("")}</ol>
         <form class="panel" id="wiz" novalidate>${stepHTML(car)}</form>
@@ -352,7 +429,7 @@
   }
   function sideHTML(car) {
     const q = S.quote(car, W.from, W.to, W.extras);
-    return `<div style="display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center"><img src="${car.img}" alt="" style="border-radius:6px;aspect-ratio:16/9;object-fit:cover"><div><b>${esc(car.brand)} ${esc(car.model)}</b><div class="small muted">${car.year} · ${esc(car.kpp)} · ${clsLabel(car.cls)}</div></div></div>
+    return `<div class="side-car"><div class="simg"><img src="${car.cut || car.img}" alt=""></div><div><b>${esc(car.brand)} ${esc(car.model)}</b><div class="small muted">${car.year} · ${esc(car.kpp)} · ${clsLabel(car.cls)}</div></div></div>
       <div class="small muted">${U.fmtDate(W.from, { day: "numeric", month: "long" })} — ${U.fmtDate(W.to, { day: "numeric", month: "long" })}</div>
       <div class="summary">${q.lines.map((l) => `<div class="line"><span>${esc(l.label)}</span><span>${U.rub(l.sum)}</span></div>`).join("")}
         <div class="line"><span>Залог, вернём</span><span>${q.deposit ? U.rub(q.deposit) : "без залога"}</span></div>
@@ -361,7 +438,7 @@
   function err(k) { return W.errors[k] ? `<span class="err-msg">${esc(W.errors[k])}</span>` : ""; }
   function stepHTML(car) {
     const cl = PM.CLASSES[car.cls], c = W.client;
-    const nav = (next) => `<div class="wiz-nav">${W.step > 0 ? '<button type="button" class="btn btn-ghost" data-back>Назад</button>' : `<a class="btn btn-ghost" href="#car-${car.id}">К машине</a>`}<button type="submit" class="btn btn-gold">${next}</button></div>`;
+    const nav = (next) => `<div class="wiz-nav">${W.step > 0 ? '<button type="button" class="btn btn-ghost" data-back>Назад</button>' : `<a class="btn btn-ghost" href="#car-${car.id}">К машине</a>`}<button type="submit" class="btn btn-primary">${next}</button></div>`;
     if (W.step === 0) {
       const free = W.to > W.from && S.isFree(car, W.from, W.to);
       return `<h2>Когда едем</h2>
@@ -492,10 +569,11 @@
 
   function viewDone(id) {
     const b = S.booking(id); if (!b) return notFound(); const car = S.car(b.carId);
-    return `<div class="wrap done-hero">
-      <div class="big">Заявка улетела</div>
+    return `<div class="done-hero">
+      <div class="ok-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <h1>Заявка отправлена</h1>
       <p class="lead" style="text-align:center">Бронь <b class="num">${esc(b.id)}</b>: ${esc(car.brand)} ${esc(car.model)}, ${U.fmtDate(b.from)} — ${U.fmtDate(b.to)}. Паша проверит документы и подтвердит бронь, обычно за 15 минут. Статус появится в разделе «Мои брони», а уведомление придёт в Max или VK.</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn btn-gold" href="#cabinet">Мои брони</a><a class="btn btn-ghost" href="#admin">Как это видит владелец</a></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn btn-primary" href="#cabinet">Мои брони</a><a class="btn btn-ghost" href="#admin">Как это видит владелец</a></div>
       <p class="small muted">Это демо: заявка сохранилась только в этом браузере и сразу видна в панели владельца.</p>
     </div>`;
   }
@@ -503,73 +581,57 @@
   /* ——— Условия ——— */
   function viewTerms() {
     const cars = S.visibleCars();
-    return `<div class="wrap page-head"><h1 style="font-size:clamp(2rem,5vw,3.4rem)">Условия аренды</h1><p class="lead">Коротко и без мелкого шрифта. Всё это же написано в договоре.</p></div>
-    <div class="wrap terms-grid">
+    return `<div class="page-head"><h1>Условия аренды</h1><p class="lead">Коротко и без мелкого шрифта. Всё это же написано в договоре.</p></div>
+    <div class="terms-grid">
       <div class="term"><h3>Кто может взять</h3><ul><li>Возраст от 21 года, стаж от 2 лет</li><li>Премиум: от 25 лет и стаж от 5 лет</li><li>Паспорт РФ и права категории B</li></ul></div>
-      <div class="term"><h3>Залог</h3><div class="big">${U.rub(PM.CLASSES.econom.deposit)} – ${U.rub(PM.CLASSES.premium.deposit)}</div><p class="muted">Эконом ${U.rub(PM.CLASSES.econom.deposit)}, комфорт ${U.rub(PM.CLASSES.comfort.deposit)}, премиум ${U.rub(PM.CLASSES.premium.deposit)}. Возвращаем сразу после осмотра. Можно без залога: +25% к цене.</p></div>
+      <div class="term"><h3>Залог</h3><div class="big-num">${U.rub(PM.CLASSES.econom.deposit)} – ${U.rub(PM.CLASSES.premium.deposit)}</div><p class="muted">Эконом ${U.rub(PM.CLASSES.econom.deposit)}, комфорт ${U.rub(PM.CLASSES.comfort.deposit)}, премиум ${U.rub(PM.CLASSES.premium.deposit)}. Возвращаем сразу после осмотра. Можно без залога: +25% к цене.</p></div>
       <div class="term"><h3>Пробег и топливо</h3><ul><li>300 км в сутки, премиум 250 км</li><li>Сверх лимита — 5 ₽ за км</li><li>Выдаём с полным баком, так же возвращаешь</li></ul></div>
       <div class="term"><h3>Что включено</h3><ul><li>ОСАГО, на премиуме ещё КАСКО</li><li>Зимняя резина в сезон</li><li>ТО и шиномонтаж при долгой аренде</li></ul></div>
       <div class="term"><h3>Нельзя</h3><ul><li>Курить в салоне — штраф 5 000 ₽</li><li>Передавать руль другому человеку</li><li>Гонки, дрифт, буксировка</li></ul></div>
       <div class="term"><h3>Штрафы и опоздания</h3><ul><li>Штрафы ГИБДД оплачивает арендатор</li><li>Опоздание больше 2 часов — плюс сутки</li><li>Грязная машина — мойка 700 ₽</li></ul></div>
     </div>
-    <div class="wrap" style="padding-bottom:40px"><h2 style="margin-bottom:16px">Цены за сутки</h2>
+    <div class="block"><h2 style="margin-bottom:14px">Цены за сутки</h2>
       <div class="price-matrix-wrap"><table class="price-matrix"><thead><tr><th>Машина</th>${PM.TIERS.map((t) => `<th>${t.label}</th>`).join("")}</tr></thead>
       <tbody>${cars.map((c) => `<tr><td><a href="#car-${c.id}">${esc(c.brand)} ${esc(c.model)}</a> <span class="muted small">${c.year}</span></td>${c.prices.map((p) => `<td>${p.toLocaleString("ru-RU")} ₽</td>`).join("")}</tr>`).join("")}</tbody></table></div>
       <p class="small muted" style="margin-top:10px">Дополнительно: подача по Томску 500 ₽, детское кресло 200 ₽/сут, без лимита пробега 400 ₽/сут.</p>
     </div>
-    <div class="wrap"><h2 style="margin-bottom:16px">Частые вопросы</h2><div class="faq">${PM.FAQ.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div></div>`;
+    <div class="block"><h2 style="margin-bottom:14px">Частые вопросы</h2><div class="faq">${PM.FAQ.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div></div>`;
   }
 
   /* ——— Контакты ——— */
   function viewContacts() {
     const framed = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
-    const map = schematicMap() + (framed ? "" : `<iframe src="${B.yandexWidget}" title="Карта: ${esc(B.city)}, ${esc(B.address)}" allowfullscreen onload="this.classList.add('ready')"></iframe>`);
-    return `<div class="wrap page-head"><h1 style="font-size:clamp(2rem,5vw,3.4rem)">Контакты</h1><p class="lead">Машины стоят у Мерседес-центра на Пушкина. Перед приездом лучше позвонить, чтобы машину подготовили.</p></div>
-    <div class="wrap contacts">
+    const map = `<div class="navmap"><div class="nm-turn"><i>${ICO.turn}</i><span><b>Пушкина, 61а</b>Мерседес-центр, парковка у шоурума</span></div>${PM.navmapSVG()}</div>` + (framed ? "" : `<iframe src="${B.yandexWidget}" title="Карта: ${esc(B.city)}, ${esc(B.address)}" allowfullscreen onload="this.classList.add('ready')"></iframe>`);
+    return `<div class="page-head"><h1>Контакты</h1><p class="lead">Машины стоят у Мерседес-центра на Пушкина. Перед приездом лучше позвонить, чтобы машину подготовили.</p></div>
+    <div class="contacts">
       <div class="c-list">
         <div class="c-item"><span class="muted small">Телефон</span><span class="c-v big" data-copy-src>${B.phoneShort}</span><span class="muted small">${B.phonePretty}</span>
-          <div class="c-actions"><a class="btn btn-gold btn-sm" href="tel:${B.phoneTel}">Позвонить</a><button class="btn btn-ghost btn-sm" data-copy="${B.phonePretty}">Скопировать номер</button></div></div>
+          <div class="c-actions"><a class="btn btn-primary btn-sm" href="tel:${B.phoneTel}">Позвонить</a><button class="btn btn-ghost btn-sm" data-copy="${B.phonePretty}">Скопировать номер</button></div></div>
         <div class="c-item"><span class="muted small">Адрес</span><span class="c-v">${B.city}, ${B.address}</span><span class="muted">${B.place}</span>
           <div class="c-actions"><a class="btn btn-ghost btn-sm" href="${B.yandex}" target="_blank" rel="noopener">Яндекс Карты</a><a class="btn btn-ghost btn-sm" href="${B.gis}" target="_blank" rel="noopener">2ГИС</a></div></div>
         <div class="c-item"><span class="muted small">Режим работы</span><span class="c-v">${B.hours}</span><span class="muted">Выдача и возврат вне графика — по договорённости</span></div>
         <div class="c-item"><span class="muted small">Написать</span><span class="muted">VK и Max работают даже когда мобильный интернет ограничен</span>
           <div class="c-actions"><a class="btn btn-ghost btn-sm" href="${B.vk}" target="_blank" rel="noopener">ВКонтакте</a><a class="btn btn-ghost btn-sm" href="${B.max}" target="_blank" rel="noopener">Max</a></div></div>
       </div>
-      <div class="map-box">${map}</div>
+      <div class="tile map-tile"><div class="map-box">${map}</div></div>
     </div>`;
   }
-  function schematicMap() {
-    /* Цвета задаются классами из CSS: var() в атрибутах fill/stroke браузеры не понимают */
-    return `<svg class="schema" viewBox="0 0 600 420" role="img" aria-label="Схема проезда: ${B.city}, ${B.address}, Мерседес-центр">
-      <rect class="m-bg" width="600" height="420"/>
-      <g class="m-road"><path d="M-20 300 L640 120"/><path d="M120 -20 L220 440"/><path d="M420 -20 L470 440"/><path d="M-20 80 L640 60"/></g>
-      <path class="m-axis" d="M-20 300 L640 120"/>
-      <g class="m-block"><rect x="250" y="250" width="120" height="70" rx="4"/><rect x="40" y="130" width="60" height="90" rx="4"/><rect x="490" y="200" width="90" height="60" rx="4"/><rect x="250" y="80" width="140" height="50" rx="4"/></g>
-      <rect class="m-target" x="300" y="150" width="96" height="50" rx="4"/>
-      <text class="m-label" x="348" y="180" text-anchor="middle" font-size="12">Мерседес-центр</text>
-      <text class="m-label" x="80" y="268" font-size="14" transform="rotate(-15 80 268)">ул. Пушкина</text>
-      <g transform="translate(348 140)"><path class="m-pin" d="M0 0 C-18 -22 -18 -46 0 -50 C18 -46 18 -22 0 0Z"/><circle class="m-pin-dot" cx="0" cy="-32" r="7"/></g>
-      <text class="m-title" x="348" y="72" text-anchor="middle" font-size="18">Пушкина, 61а</text>
-      <text class="m-label" x="20" y="400" font-size="11">Схема проезда. Точный маршрут — в Яндекс Картах или 2ГИС.</text>
-    </svg>`;
-  }
-
   /* ——— Кабинет клиента ——— */
   function viewCabinet() {
     const mine = S.bookings.filter((b) => b.mine);
-    return `<div class="wrap page-head"><h1 style="font-size:clamp(2rem,5vw,3.4rem)">Мои брони</h1><p class="lead">Статус заявки, договор и даты в одном месте.</p></div>
-    <div class="wrap bk-list">${mine.length ? mine.map((b) => { const car = S.car(b.carId) || { brand: "Машина", model: "удалена", img: "" };
-      return `<div class="bk"><img src="${car.img}" alt=""><div style="display:grid;gap:6px;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><b>${esc(car.brand)} ${esc(car.model)}</b>${PM.statusPill(b.status)}</div>
+    return `<div class="page-head"><h1>Мои брони</h1><p class="lead">Статус заявки, договор и даты в одном месте.</p></div>
+    <div class="bk-list">${mine.length ? mine.map((b) => { const car = S.car(b.carId) || { brand: "Машина", model: "удалена", img: "" };
+      return `<div class="bk"><div class="bimg"><img src="${car.cut || car.img}" alt=""></div><div style="display:grid;gap:6px;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><b>${esc(car.brand)} ${esc(car.model)}</b>${PM.statusPill(b.status)}</div>
         <span class="muted small">${esc(b.id)} · ${U.fmtDate(b.from)} — ${U.fmtDate(b.to)}</span><span class="num">${U.rub(b.total)}${b.deposit ? " + залог " + U.rub(b.deposit) : ""}</span>
         ${b.status === "new" ? '<span class="small muted">Ждёт подтверждения владельца</span>' : b.status === "approved" ? `<span class="small" style="color:var(--go)">Подтверждена. Ждём ${U.fmtDate(b.from)} на Пушкина, 61а</span>` : b.status === "rejected" ? '<span class="small" style="color:var(--stop)">Владелец отклонил заявку. Позвоните, чтобы подобрать другую машину</span>' : ""}</div>
         <div class="bk-actions"><button class="btn btn-ghost btn-sm" data-contract="${b.id}">Договор</button><a class="btn btn-ghost btn-sm" href="#car-${b.carId}">Машина</a></div></div>`; }).join("") :
-      `<div class="empty"><h3>Броней пока нет</h3><p class="muted">Выбери машину в каталоге — заявка появится здесь.</p><a class="btn btn-gold" href="#catalog">Открыть каталог</a></div>`}</div>`;
+      `<div class="empty"><h3>Броней пока нет</h3><p class="muted">Выбери машину в каталоге — заявка появится здесь.</p><a class="btn btn-primary" href="#catalog">Открыть каталог</a></div>`}</div>`;
   }
   function bindCabinet() { $$("[data-contract]").forEach((b) => b.addEventListener("click", () => openContract(b.dataset.contract))); }
   PM.openContract = function openContract(id) { const b = S.booking(id), car = S.car(b.carId); PM.modal("Договор " + b.id, PM.contractHTML(b, car), "contract-modal"); };
   const openContract = PM.openContract;
 
-  function notFound() { return `<div class="wrap empty" style="margin-block:48px"><h3>Такой страницы нет</h3><p class="muted">Возможно, машину сняли с аренды.</p><a class="btn btn-gold" href="#catalog">В каталог</a></div>`; }
+  function notFound() { return `<div class="wrap empty" style="margin-block:48px"><h3>Такой страницы нет</h3><p class="muted">Возможно, машину сняли с аренды.</p><a class="btn btn-primary" href="#catalog">В каталог</a></div>`; }
 
   /* ——— Роутер ——— */
   function route() {
@@ -595,8 +657,22 @@
   PM.route = route;
   window.addEventListener("hashchange", route);
 
+  /* Режим экрана: Авто → День → Ночь, как свет фар */
+  const MODES = { auto: ["Авто", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>'],
+    light: ["День", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'],
+    dark: ["Ночь", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>'] };
+  let mode = "auto"; try { mode = localStorage.getItem("pm_mode") || "auto"; } catch (e) {}
+  const applyMode = () => {
+    if (mode === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", mode);
+    $$("[data-mode-toggle]").forEach((b) => { b.innerHTML = MODES[mode][1] + "<span>" + MODES[mode][0] + "</span>"; b.title = "Режим экрана: " + MODES[mode][0]; });
+  };
+  $$("[data-mode-toggle]").forEach((b) => b.addEventListener("click", () => { mode = { auto: "light", light: "dark", dark: "auto" }[mode]; try { localStorage.setItem("pm_mode", mode); } catch (e) {} applyMode(); PM.toast("Режим экрана: " + MODES[mode][0]); }));
+  applyMode();
+  const clock = () => { try { $("#sb-clock").textContent = new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tomsk" }); } catch (e) {} };
+  clock(); setInterval(clock, 15000);
+
   /* Сеть: показываем, что каталог открыт из сохранённой копии */
-  const net = () => { $("#offline").hidden = navigator.onLine; };
+  const net = () => { $("#offline").hidden = navigator.onLine; const n = $("#sb-net"); n.classList.toggle("off", !navigator.onLine); n.textContent = navigator.onLine ? "В сети" : "Без сети"; };
   window.addEventListener("online", net); window.addEventListener("offline", net); net();
   $("#reset-demo").addEventListener("click", () => { S.reset(); W = null; PM.toast("Демо-данные сброшены"); route(); });
 

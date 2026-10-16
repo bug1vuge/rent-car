@@ -19,6 +19,7 @@ PM.BIZ = {
   max: "https://max.ru/"
 };
 
+/* Классы показаны как режимы езды на переключателе */
 PM.CLASSES = {
   econom:  { label: "Эконом",  deposit: 5000,  minAge: 21, minExp: 2, mileage: 300 },
   comfort: { label: "Комфорт", deposit: 10000, minAge: 21, minExp: 2, mileage: 300 },
@@ -41,31 +42,31 @@ PM.EXTRAS = [
 ];
 
 PM.SEED_CARS = [
-  { id: "granta-1", brand: "Lada", model: "Granta", year: 2023, cls: "econom", img: "img/granta.webp",
+  { id: "granta-1", brand: "Lada", model: "Granta", year: 2023, cls: "econom", img: "img/granta.webp", cut: "img/cut-granta.webp",
     kpp: "МКПП", fuel: "Бензин", engine: "1.6 л · 90 л.с.", cons: "6,8 л / 100 км", seats: 5, color: "Белый",
     plate: "А 000 АА 70", taxi: true, status: "free", prices: [2200, 2000, 1800, 1600],
     features: ["Кондиционер", "Зимняя резина", "Bluetooth", "Обогрев сидений"] },
-  { id: "granta-2", brand: "Lada", model: "Granta", year: 2022, cls: "econom", img: "img/granta.webp",
+  { id: "granta-2", brand: "Lada", model: "Granta", year: 2022, cls: "econom", img: "img/granta.webp", cut: "img/cut-granta.webp",
     kpp: "МКПП", fuel: "Бензин", engine: "1.6 л · 90 л.с.", cons: "6,8 л / 100 км", seats: 5, color: "Белый",
     plate: "В 111 ВВ 70", taxi: true, status: "free", prices: [2000, 1850, 1700, 1500],
     features: ["Кондиционер", "Зимняя резина", "Обогрев сидений"] },
-  { id: "bora-1", brand: "Volkswagen", model: "Bora", year: 2023, cls: "comfort", img: "img/bora.webp",
+  { id: "bora-1", brand: "Volkswagen", model: "Bora", year: 2023, cls: "comfort", img: "img/bora.webp", cut: "img/cut-bora.webp",
     kpp: "АКПП", fuel: "Газ + бензин", engine: "1.5 л · 113 л.с.", cons: "≈ 3 ₽ / км на газу", seats: 5, color: "Белый",
     plate: "Р 592 РО 70", taxi: true, status: "free", prices: [2900, 2700, 2400, 2200],
     features: ["ГБО — дешёвый километр", "Климат-контроль", "Камера заднего вида", "Зимняя резина", "CarPlay / Android Auto"] },
-  { id: "changan-1", brand: "Changan", model: "Alsvin", year: 2024, cls: "comfort", img: "img/changan.webp",
+  { id: "changan-1", brand: "Changan", model: "Alsvin", year: 2024, cls: "comfort", img: "img/changan.webp", cut: "img/cut-changan.webp",
     kpp: "Робот", fuel: "Бензин", engine: "1.5 л · 107 л.с.", cons: "6,1 л / 100 км", seats: 5, color: "Белый",
     plate: "Р 159 РМ 70", taxi: true, status: "free", prices: [3300, 3100, 2800, 2600],
     features: ["Климат-контроль", "Экран 10″", "Камера заднего вида", "Подогрев руля", "Зимняя резина"] },
-  { id: "hongqi-1", brand: "Hongqi", model: "H5", year: 2024, cls: "premium", img: "img/premium.webp",
+  { id: "hongqi-1", brand: "Hongqi", model: "H5", year: 2024, cls: "premium", img: "img/premium.webp", cut: "img/cut-premium.webp",
     kpp: "АКПП", fuel: "Бензин", engine: "1.5T · 169 л.с.", cons: "7,2 л / 100 км", seats: 5, color: "Чёрный",
     plate: "У 015 НУ 761", taxi: false, status: "free", prices: [7500, 7000, 6500, 6000],
     features: ["Кожаный салон", "Панорамная крыша", "Адаптивный круиз", "Камеры 360°", "Подогрев и вентиляция сидений", "КАСКО включено"] },
-  { id: "hongqi-2", brand: "Hongqi", model: "H5", year: 2024, cls: "premium", img: "img/premium.webp",
+  { id: "hongqi-2", brand: "Hongqi", model: "H5", year: 2024, cls: "premium", img: "img/premium.webp", cut: "img/cut-premium.webp",
     kpp: "АКПП", fuel: "Бензин", engine: "1.5T · 169 л.с.", cons: "7,2 л / 100 км", seats: 5, color: "Чёрный",
     plate: "Т 656 НУ 761", taxi: false, status: "free", prices: [7500, 7000, 6500, 6000],
     features: ["Кожаный салон", "Панорамная крыша", "Адаптивный круиз", "Камеры 360°", "КАСКО включено"] },
-  { id: "hongqi-3", brand: "Hongqi", model: "H5", year: 2023, cls: "premium", img: "img/premium.webp",
+  { id: "hongqi-3", brand: "Hongqi", model: "H5", year: 2023, cls: "premium", img: "img/premium.webp", cut: "img/cut-premium.webp",
     kpp: "АКПП", fuel: "Бензин", engine: "1.5T · 169 л.с.", cons: "7,2 л / 100 км", seats: 5, color: "Чёрный",
     plate: "Т 684 НУ 761", taxi: false, status: "service", prices: [7000, 6600, 6200, 5800],
     features: ["Кожаный салон", "Адаптивный круиз", "Камеры 360°", "КАСКО включено"] }
