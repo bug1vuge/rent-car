@@ -38,6 +38,12 @@
 .drive button b { font-weight: 600; font-size: .9rem; }
 .drive button small { font-size: .72rem; font-variant-numeric: tabular-nums; }
 .drive button[aria-pressed="true"] { color: var(--accent-ink); }
+@media (max-width: 480px) {
+  .drive { display: grid; width: 100%; }
+  .drive button { padding: 7px 4px; }
+  .drive button b { font-size: .84rem; }
+  .drive button small { font-size: .68rem; white-space: nowrap; }
+}
 .drive .thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; border-radius: 999px; background: var(--accent); box-shadow: 0 6px 18px -6px var(--accent); transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
 .spec-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .spec { font-size: .8rem; padding: 5px 10px; border-radius: 999px; background: var(--tile-2); border: 1px solid var(--stroke); color: var(--fg); white-space: nowrap; }
