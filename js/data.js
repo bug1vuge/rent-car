@@ -1,9 +1,9 @@
 /* Демо-данные. Цены, характеристики и модели — заглушки, их нужно сверить с владельцем.
    В полной версии всё это придёт с сервера. */
-window.PM = window.PM || {};
+window.RC = window.RC || {};
 
-PM.BIZ = {
-  name: "Паша Машины",
+RC.BIZ = {
+  name: "RentCar",
   city: "Томск",
   address: "ул. Пушкина, 61а",
   place: "Мерседес-центр, парковка у шоурума",
@@ -24,28 +24,28 @@ PM.BIZ = {
 };
 
 /* Классы показаны как режимы езды на переключателе */
-PM.CLASSES = {
+RC.CLASSES = {
   econom:  { label: "Эконом",  deposit: 5000,  minAge: 21, minExp: 2, mileage: 300 },
   comfort: { label: "Комфорт", deposit: 10000, minAge: 21, minExp: 2, mileage: 300 },
   premium: { label: "Премиум", deposit: 30000, minAge: 25, minExp: 5, mileage: 250 }
 };
 
 /* Тарифная сетка по сроку аренды: цена за сутки падает с ростом срока */
-PM.TIERS = [
+RC.TIERS = [
   { from: 1,  to: 2,   label: "1–2 суток" },
   { from: 3,  to: 6,   label: "3–6 суток" },
   { from: 7,  to: 13,  label: "7–13 суток" },
   { from: 14, to: 999, label: "от 14 суток" }
 ];
 
-PM.EXTRAS = [
+RC.EXTRAS = [
   { id: "delivery", label: "Подача по Томску", note: "Привезём машину к дому или на работу", price: 500, per: "once" },
   { id: "child",    label: "Детское кресло", note: "Группа 1–2, от 9 до 25 кг", price: 200, per: "day" },
   { id: "unlim",    label: "Без лимита пробега", note: "Вместо 300 км в сутки", price: 400, per: "day" },
   { id: "nodep",    label: "Без залога", note: "+25% к стоимости аренды", price: 0.25, per: "pct" }
 ];
 
-PM.SEED_CARS = [
+RC.SEED_CARS = [
   { id: "granta-1", brand: "Lada", model: "Granta", year: 2023, cls: "econom", img: "img/granta.webp", cut: "img/cut-granta.webp",
     kpp: "МКПП", fuel: "Бензин", engine: "1.6 л · 90 л.с.", cons: "6,8 л / 100 км", seats: 5, color: "Белый",
     plate: "А 000 АА 70", taxi: true, status: "free", prices: [2200, 2000, 1800, 1600],
@@ -77,34 +77,34 @@ PM.SEED_CARS = [
 ];
 
 /* Брони относительно сегодняшней даты, чтобы демо всегда выглядело живым */
-PM.seedBookings = function () {
-  const d = (n) => PM.util.iso(PM.util.addDays(PM.util.today(), n));
+RC.seedBookings = function () {
+  const d = (n) => RC.util.iso(RC.util.addDays(RC.util.today(), n));
   return [
-    { id: "PM-1041", carId: "granta-2", from: d(-2), to: d(3), status: "active", demo: true, mine: false,
+    { id: "RC-1041", carId: "granta-2", from: d(-2), to: d(3), status: "active", demo: true, mine: false,
       client: { name: "Артём Соколов", phone: "+7 913 820-11-45", birth: "1998-04-12", license: "70 21 456789", licenseSince: "2017-06-01" },
       extras: [], total: 11100, deposit: 5000, createdAt: d(-4) },
-    { id: "PM-1042", carId: "hongqi-2", from: d(-1), to: d(4), status: "active", demo: true, mine: false,
+    { id: "RC-1042", carId: "hongqi-2", from: d(-1), to: d(4), status: "active", demo: true, mine: false,
       client: { name: "Дмитрий Ким", phone: "+7 923 401-77-02", birth: "1991-09-30", license: "70 18 112233", licenseSince: "2011-03-15" },
       extras: [], total: 35000, deposit: 30000, createdAt: d(-3) },
-    { id: "PM-1043", carId: "bora-1", from: d(2), to: d(16), status: "approved", demo: true, mine: false,
+    { id: "RC-1043", carId: "bora-1", from: d(2), to: d(16), status: "approved", demo: true, mine: false,
       client: { name: "Руслан Абдуллаев", phone: "+7 952 155-90-31", birth: "1995-01-22", license: "70 20 998877", licenseSince: "2015-08-10" },
       extras: [], total: 30800, deposit: 10000, createdAt: d(-1) },
-    { id: "PM-1044", carId: "changan-1", from: d(1), to: d(3), status: "new", demo: true, mine: false,
+    { id: "RC-1044", carId: "changan-1", from: d(1), to: d(3), status: "new", demo: true, mine: false,
       client: { name: "Ксения Миронова", phone: "+7 906 950-42-18", birth: "2000-11-05", license: "70 22 334455", licenseSince: "2020-02-20" },
       extras: ["delivery"], total: 6700, deposit: 10000, createdAt: d(0) },
-    { id: "PM-1045", carId: "hongqi-1", from: d(5), to: d(7), status: "new", demo: true, mine: false,
+    { id: "RC-1045", carId: "hongqi-1", from: d(5), to: d(7), status: "new", demo: true, mine: false,
       client: { name: "Игорь Павлов", phone: "+7 913 105-66-70", birth: "1988-07-14", license: "70 09 776655", licenseSince: "2008-05-01" },
       extras: ["child"], total: 15400, deposit: 30000, createdAt: d(0) },
-    { id: "PM-1031", carId: "granta-1", from: d(-12), to: d(-5), status: "done", demo: true, mine: false,
+    { id: "RC-1031", carId: "granta-1", from: d(-12), to: d(-5), status: "done", demo: true, mine: false,
       client: { name: "Олег Ветров", phone: "+7 923 222-10-09", birth: "1993-03-03", license: "70 15 101010", licenseSince: "2013-01-01" },
       extras: [], total: 12600, deposit: 5000, createdAt: d(-14) },
-    { id: "PM-1035", carId: "changan-1", from: d(-9), to: d(-2), status: "done", demo: true, mine: false,
+    { id: "RC-1035", carId: "changan-1", from: d(-9), to: d(-2), status: "done", demo: true, mine: false,
       client: { name: "Мария Лапина", phone: "+7 913 777-30-30", birth: "1997-12-12", license: "70 19 202020", licenseSince: "2016-09-09" },
       extras: [], total: 19600, deposit: 10000, createdAt: d(-10) }
   ];
 };
 
-PM.FAQ = [
+RC.FAQ = [
   ["Что нужно, чтобы взять машину?", "Паспорт РФ и водительское удостоверение категории B. Фото документов загружаете прямо при бронировании, на месте только сверяем оригиналы и отдаём ключи."],
   ["Можно взять машину под такси?", "Да. Granta, Bora и Changan можно брать для работы в такси от 7 суток. Bora стоит на газу, поэтому километр выходит в 2–3 раза дешевле, чем на бензине."],
   ["Когда вернут залог?", "Сразу после осмотра машины при возврате, если нет повреждений и штрафов. Если штраф придёт позже, он удерживается из залога, поэтому его возвращаем через 10 дней."],

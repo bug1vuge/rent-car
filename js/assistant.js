@@ -1,7 +1,7 @@
 /* Помощник на главной. В демо отвечает по сценариям из правил проката, без внешних сервисов.
    В полной версии этот модуль заменяется ботом с тем же интерфейсом: html() и bind(). */
 (function () {
-  const S = PM.store, U = PM.util, B = PM.BIZ, esc = U.esc;
+  const S = RC.store, U = RC.util, B = RC.BIZ, esc = U.esc;
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const ic = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${d}</svg>`;
   const QUICK = [
@@ -25,19 +25,19 @@
   /* Сценарии: каждый возвращает текст и кнопки действий */
   const intents = {
     book() {
-      const { from, to } = PM.home.dates(); const free = freeOn(from, to);
+      const { from, to } = RC.home.dates(); const free = freeOn(from, to);
       return { text: `На ${fmt(from)} — ${fmt(to)} свободно ${free.length} ${U.plural(free.length, "машина", "машины", "машин")}: ${free.slice(0, 4).map(carName).join(", ")}${free.length > 4 ? " и другие" : ""}. Даты можно поменять в виджете «Мои даты».`,
         acts: [["Показать свободные", "catalog-dates"], ["Забронировать машину на сцене", "book-stage"]] };
     },
     compare() {
-      const rows = Object.entries(PM.CLASSES).map(([k, v]) => { const cars = S.visibleCars().filter((c) => c.cls === k); if (!cars.length) return ""; return `${v.label}: от ${Math.min(...cars.map((c) => c.prices[3])).toLocaleString("ru-RU")} ₽, залог ${rub(v.deposit)}, с ${v.minAge} лет`; }).filter(Boolean);
+      const rows = Object.entries(RC.CLASSES).map(([k, v]) => { const cars = S.visibleCars().filter((c) => c.cls === k); if (!cars.length) return ""; return `${v.label}: от ${Math.min(...cars.map((c) => c.prices[3])).toLocaleString("ru-RU")} ₽, залог ${rub(v.deposit)}, с ${v.minAge} лет`; }).filter(Boolean);
       return { text: rows.join(". ") + ". Переключай классы на сцене слева, чтобы посмотреть машины.", acts: [["Эконом", "cls-econom"], ["Комфорт", "cls-comfort"], ["Премиум", "cls-premium"]] };
     },
     insurance() {
-      return { text: `ОСАГО включено во все машины. На премиум-классе ещё КАСКО, франшиза 30 000 ₽. Залог: эконом ${rub(PM.CLASSES.econom.deposit)}, комфорт ${rub(PM.CLASSES.comfort.deposit)}, премиум ${rub(PM.CLASSES.premium.deposit)}. Можно взять без залога за +25% к цене.`, acts: [["Все условия", "terms"]] };
+      return { text: `ОСАГО включено во все машины. На премиум-классе ещё КАСКО, франшиза 30 000 ₽. Залог: эконом ${rub(RC.CLASSES.econom.deposit)}, комфорт ${rub(RC.CLASSES.comfort.deposit)}, премиум ${rub(RC.CLASSES.premium.deposit)}. Можно взять без залога за +25% к цене.`, acts: [["Все условия", "terms"]] };
     },
     price() {
-      const car = PM.home.car(); const { from, to } = PM.home.dates(); const q = S.quote(car, from, to, []); const free = S.isFree(car, from, to);
+      const car = RC.home.car(); const { from, to } = RC.home.dates(); const q = S.quote(car, from, to, []); const free = S.isFree(car, from, to);
       return { text: `${carName(car)}, ${fmt(from)} — ${fmt(to)}: ${q.days} ${U.plural(q.days, "сутки", "суток", "суток")} по ${rub(q.perDay)}, итого ${rub(q.base)} и залог ${rub(q.deposit)}, его вернём. ${free ? "На эти даты машина свободна." : "На эти даты она занята, посмотри другие свободные."}`,
         acts: free ? [["Забронировать", "book-stage"]] : [["Свободные на эти даты", "catalog-dates"]] };
     }
@@ -46,9 +46,9 @@
   /* Свободный текст: даты и ключевые слова */
   const RULES = [
     [/возраст|стаж|сколько лет|со скольки/, () => ({ text: "Эконом и комфорт — с 21 года и стажем от 2 лет. Премиум — с 25 лет и стажем от 5 лет.", acts: [] })],
-    [/выходн/, () => { const [f, t] = weekend(); PM.home.setDates(f, t); return intents.book(); }],
-    [/завтра/, () => { const f = U.iso(U.addDays(U.today(), 1)); const m = text.match(/(\d+)\s*(дн|сут|дней)/); PM.home.setDates(f, U.iso(U.addDays(U.parse(f), m ? +m[1] : 1))); return intents.book(); }],
-    [/(\d+)\s*(дн|сут|ден|недел)/, (m) => { const n = /недел/.test(m[2]) ? +m[1] * 7 : +m[1]; const f = PM.home.dates().from; PM.home.setDates(f, U.iso(U.addDays(U.parse(f), Math.max(1, Math.min(60, n))))); return intents.price(); }],
+    [/выходн/, () => { const [f, t] = weekend(); RC.home.setDates(f, t); return intents.book(); }],
+    [/завтра/, () => { const f = U.iso(U.addDays(U.today(), 1)); const m = text.match(/(\d+)\s*(дн|сут|дней)/); RC.home.setDates(f, U.iso(U.addDays(U.parse(f), m ? +m[1] : 1))); return intents.book(); }],
+    [/(\d+)\s*(дн|сут|ден|недел)/, (m) => { const n = /недел/.test(m[2]) ? +m[1] * 7 : +m[1]; const f = RC.home.dates().from; RC.home.setDates(f, U.iso(U.addDays(U.parse(f), Math.max(1, Math.min(60, n))))); return intents.price(); }],
     [/сколько|цен|стоит|стоимост|рассчит|посчит/, () => intents.price()],
     [/сравн|класс|какие машин|что есть|автопарк/, () => intents.compare()],
     [/свобод|бронир|забронир|взять|аренд/, () => intents.book()],
@@ -71,7 +71,7 @@
   function answer(q) {
     text = q.toLowerCase();
     for (const [re, fn] of RULES) { const m = text.match(re); if (m) return fn(m); }
-    return { text: `Такой вопрос лучше обсудить с Пашей: ${B.phonePretty}. А я могу подобрать машину, посчитать цену или рассказать про залог и страховку.`, acts: [["Подобрать машину", "q-book"], ["Рассчитать цену", "q-price"]] };
+    return { text: `Такой вопрос лучше обсудить с менеджером: ${B.phonePretty}. А я могу подобрать машину, посчитать цену или рассказать про залог и страховку.`, acts: [["Подобрать машину", "q-book"], ["Рассчитать цену", "q-price"]] };
   }
 
   function msgHTML(m) {
@@ -99,10 +99,10 @@
     $("#as-input", root).addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#as-form", root).requestSubmit(); } });
     logEl.addEventListener("click", (e) => {
       const b = e.target.closest("[data-act]"); if (!b) return; const a = b.dataset.act;
-      if (a === "catalog-dates") { PM.home.filtersFor({ onlyFree: true }); location.hash = "catalog"; }
-      else if (a === "book-stage") { const c = PM.home.car(); location.hash = "car-" + c.id; }
-      else if (a.startsWith("cls-")) { PM.home.setClass(a.slice(4)); }
-      else if (a === "taxi") { PM.home.filtersFor({ taxi: true, cls: [] }); location.hash = "catalog"; }
+      if (a === "catalog-dates") { RC.home.filtersFor({ onlyFree: true }); location.hash = "catalog"; }
+      else if (a === "book-stage") { const c = RC.home.car(); location.hash = "car-" + c.id; }
+      else if (a.startsWith("cls-")) { RC.home.setClass(a.slice(4)); }
+      else if (a === "taxi") { RC.home.filtersFor({ taxi: true, cls: [] }); location.hash = "catalog"; }
       else if (a === "q-book") { push({ me: true, text: "Подобрать машину" }); reply(intents.book); }
       else if (a === "q-price") { push({ me: true, text: "Рассчитать цену" }); reply(intents.price); }
       else location.hash = a;
@@ -111,5 +111,5 @@
     else logEl.scrollTop = logEl.scrollHeight;
   }
 
-  PM.assistant = { html, bind };
+  RC.assistant = { html, bind };
 })();

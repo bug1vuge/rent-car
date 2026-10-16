@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Паша Машины</title>
+<title>RentCar Томск</title>
 <meta name="description" content="Аренда автомобилей в Томске: свободные машины онлайн, бронь за 15 минут, договор с телефона. Пушкина, 61а.">
 <meta name="theme-color" content="#07090D" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#E6E9EE" media="(prefers-color-scheme: light)">
@@ -12,7 +12,7 @@
 <link rel="preload" href="fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script>
   /* Режим экрана выставляем до отрисовки, чтобы не мигало */
-  try { var m = localStorage.getItem("pm_mode"); if (m === "light" || m === "dark") document.documentElement.setAttribute("data-theme", m); } catch (e) {}
+  try { var m = localStorage.getItem("rc_mode"); if (m === "light" || m === "dark") document.documentElement.setAttribute("data-theme", m); } catch (e) {}
 </script>
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/base.css">
@@ -24,7 +24,7 @@
 <body>
 <div class="shell">
   <aside class="rail" aria-label="Меню">
-    <a class="rail-logo" href="#" aria-label="Паша Машины, на главную">ПМ</a>
+    <a class="rail-logo" href="#" aria-label="RentCar, на главную">RC</a>
     <nav class="rail-nav" id="rail-nav" aria-label="Разделы"></nav>
     <div class="rail-bottom"><button type="button" class="mode-btn" data-mode-toggle aria-label="Режим экрана"></button></div>
   </aside>
@@ -32,7 +32,7 @@
   <div class="main">
     <div class="wrap">
       <header class="statusbar">
-        <a class="sb-brand" href="#"><span class="rail-logo-m" aria-hidden="true">ПМ</span><span><b>Паша Машины</b><br><span>аренда авто · Томск</span></span></a>
+        <a class="sb-brand" href="#"><span class="rail-logo-m" aria-hidden="true">RC</span><span><b>RentCar</b><br><span>аренда авто · Томск</span></span></a>
         <div class="sb-items">
           <span class="sb-pill sb-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>Пушкина, 61а</span>
           <span class="sb-pill sb-net" id="sb-net">В сети</span>
@@ -46,7 +46,7 @@
       <main id="app" tabindex="-1"></main>
 
       <footer class="foot">
-        <span>Паша Машины · аренда авто в Томске · Пушкина, 61а</span>
+        <span>RentCar · аренда авто в Томске · Пушкина, 61а</span>
         <span>Демо-версия: данные хранятся только в этом браузере. <button type="button" id="reset-demo">Сбросить демо</button> · <a href="#admin">Вход для владельца</a></span>
       </footer>
     </div>

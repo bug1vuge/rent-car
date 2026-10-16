@@ -1,10 +1,10 @@
 /* Панель владельца: сводка, заявки, автопарк, календарь. */
 (function () {
-  const S = PM.store, U = PM.util, esc = U.esc, $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const S = RC.store, U = RC.util, esc = U.esc, $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const PIN = "2002";
   let tab = "summary", reqFilter = "new";
-  const authed = () => { try { return sessionStorage.getItem("pm_admin") === "1"; } catch (e) { return PM._admin === true; } };
-  const setAuthed = () => { PM._admin = true; try { sessionStorage.setItem("pm_admin", "1"); } catch (e) {} };
+  const authed = () => { try { return sessionStorage.getItem("rc_admin") === "1"; } catch (e) { return RC._admin === true; } };
+  const setAuthed = () => { RC._admin = true; try { sessionStorage.setItem("rc_admin", "1"); } catch (e) {} };
   const carName = (c) => c ? c.brand + " " + c.model : "Удалённая машина";
   const isoT = () => U.iso(U.today());
 
@@ -73,11 +73,11 @@
       <div class="req-list">${list.length ? list.map(reqCard).join("") : '<div class="empty"><h3>Здесь пусто</h3><p class="muted">Новые заявки с сайта появляются в этой вкладке. Попробуй сам оформить бронь в каталоге.</p><a class="btn btn-primary" href="#catalog">Открыть каталог</a></div>'}</div>`;
   }
   function reqCard(b) {
-    const car = S.car(b.carId); const cl = car ? PM.CLASSES[car.cls] : null;
+    const car = S.car(b.carId); const cl = car ? RC.CLASSES[car.cls] : null;
     const age = U.yearsSince(b.client.birth), exp = U.yearsSince(b.client.licenseSince);
     const okAge = cl && age >= cl.minAge, okExp = cl && exp >= cl.minExp;
     const conflict = car && b.status === "new" && !S.isFree(car, b.from, b.to);
-    const extras = (b.extras || []).map((id) => PM.EXTRAS.find((e) => e.id === id)?.label).filter(Boolean).join(", ");
+    const extras = (b.extras || []).map((id) => RC.EXTRAS.find((e) => e.id === id)?.label).filter(Boolean).join(", ");
     const docs = b.docs ? Object.entries(b.docs) : [];
     const docNames = { pass1: "Паспорт, фото", pass2: "Паспорт, прописка", lic1: "Права, лицо", lic2: "Права, оборот" };
     const actions = {
@@ -86,7 +86,7 @@
       active: `<button class="btn btn-primary btn-sm" data-act="done" data-id="${b.id}">Машину вернули</button>`
     }[b.status] || "";
     return `<article class="req s-${b.status}">
-      <div class="req-head"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h3 style="font-size:1.1rem">${esc(carName(car))}</h3>${PM.statusPill(b.status)}${b.mine ? '<span class="pill p-active">с сайта, только что</span>' : ""}</div><span class="muted small num">${esc(b.id)} · создана ${U.fmtDate(b.createdAt, { day: "numeric", month: "short" })}</span></div>
+      <div class="req-head"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h3 style="font-size:1.1rem">${esc(carName(car))}</h3>${RC.statusPill(b.status)}${b.mine ? '<span class="pill p-active">с сайта, только что</span>' : ""}</div><span class="muted small num">${esc(b.id)} · создана ${U.fmtDate(b.createdAt, { day: "numeric", month: "short" })}</span></div>
       <div class="req-grid">
         <div><span>Клиент</span>${esc(b.client.name)}</div>
         <div><span>Телефон</span><span style="color:var(--fg);font-size:.92rem" class="num">${esc(b.client.phone)}</span></div>
@@ -126,7 +126,7 @@
     return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px"><p class="muted small" style="max-width:60ch">Статус и цена сразу меняются на сайте. Машина «На ТО» или «Скрыта» не показывается свободной.</p><button class="btn btn-primary btn-sm" data-addcar>Добавить машину</button></div>
       <div class="fleet" style="padding-bottom:56px">${S.cars.map((c) => `<div class="fleet-row">
         <div class="fimg"><img src="${c.cut || c.img}" alt=""></div>
-        <div style="min-width:0"><b>${esc(carName(c))}</b> <span class="muted small">${c.year}</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px"><span class="plate">${esc(c.plate)}</span><span class="small muted">${PM.CLASSES[c.cls].label} · ${esc(c.kpp)}</span></div><span class="small st-${S.liveStatus(c).key}" style="display:block;padding-top:4px;font-weight:600">${esc(c.status === "hidden" ? "Скрыта с сайта" : S.liveStatus(c).label)}</span></div>
+        <div style="min-width:0"><b>${esc(carName(c))}</b> <span class="muted small">${c.year}</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px"><span class="plate">${esc(c.plate)}</span><span class="small muted">${RC.CLASSES[c.cls].label} · ${esc(c.kpp)}</span></div><span class="small st-${S.liveStatus(c).key}" style="display:block;padding-top:4px;font-weight:600">${esc(c.status === "hidden" ? "Скрыта с сайта" : S.liveStatus(c).label)}</span></div>
         <div class="f-controls">
           <div class="field"><label for="st-${c.id}">Статус</label><select class="input" id="st-${c.id}" data-status="${c.id}"><option value="free" ${c.status === "free" ? "selected" : ""}>В работе</option><option value="service" ${c.status === "service" ? "selected" : ""}>На ТО</option><option value="hidden" ${c.status === "hidden" ? "selected" : ""}>Скрыта</option></select></div>
           <div class="field"><label for="pr-${c.id}">Цена 1–2 сут, ₽</label><input class="input num" id="pr-${c.id}" type="number" min="500" step="100" value="${c.prices[0]}" data-price="${c.id}"></div>
@@ -137,7 +137,7 @@
     return `<form id="addcar" style="display:grid;gap:12px" novalidate>
       <div class="row2"><div class="field"><label for="a-brand">Марка</label><input class="input" id="a-brand" required placeholder="Kia"></div><div class="field"><label for="a-model">Модель</label><input class="input" id="a-model" required placeholder="Rio"></div></div>
       <div class="row3"><div class="field"><label for="a-year">Год</label><input class="input" id="a-year" type="number" value="2024" min="2000" max="2027"></div>
-        <div class="field"><label for="a-cls">Класс</label><select class="input" id="a-cls">${Object.entries(PM.CLASSES).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("")}</select></div>
+        <div class="field"><label for="a-cls">Класс</label><select class="input" id="a-cls">${Object.entries(RC.CLASSES).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("")}</select></div>
         <div class="field"><label for="a-kpp">Коробка</label><select class="input" id="a-kpp"><option>АКПП</option><option>МКПП</option><option>Робот</option><option>Вариатор</option></select></div></div>
       <div class="row3"><div class="field"><label for="a-fuel">Топливо</label><select class="input" id="a-fuel"><option>Бензин</option><option>Газ + бензин</option><option>Дизель</option></select></div>
         <div class="field"><label for="a-plate">Госномер</label><input class="input" id="a-plate" placeholder="А 123 АА 70"></div>
@@ -150,28 +150,28 @@
 
   function bind() {
     const pf = $("#pin-form");
-    if (pf) { $("#pin").focus(); pf.addEventListener("submit", (e) => { e.preventDefault(); if ($("#pin").value === PIN) { setAuthed(); PM.route(); } else { $("#pin-err").hidden = false; $("#pin").classList.add("err"); } }); return; }
-    $$("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; PM.route(); }));
-    $$("[data-goto]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.goto; reqFilter = "new"; PM.route(); }));
-    $$("[data-rf]").forEach((b) => b.addEventListener("click", () => { reqFilter = b.dataset.rf; PM.route(); }));
+    if (pf) { $("#pin").focus(); pf.addEventListener("submit", (e) => { e.preventDefault(); if ($("#pin").value === PIN) { setAuthed(); RC.route(); } else { $("#pin-err").hidden = false; $("#pin").classList.add("err"); } }); return; }
+    $$("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; RC.route(); }));
+    $$("[data-goto]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.goto; reqFilter = "new"; RC.route(); }));
+    $$("[data-rf]").forEach((b) => b.addEventListener("click", () => { reqFilter = b.dataset.rf; RC.route(); }));
     $$("[data-act]").forEach((b) => b.addEventListener("click", () => {
       const msg = { approved: "Бронь подтверждена. Клиенту уйдёт уведомление", rejected: "Заявка отклонена", active: "Отмечено: машина выдана", done: "Машина вернулась в парк" }[b.dataset.act];
-      S.setStatus(b.dataset.id, b.dataset.act); PM.toast(msg); PM.route();
+      S.setStatus(b.dataset.id, b.dataset.act); RC.toast(msg); RC.route();
     }));
-    $$("[data-contract]").forEach((b) => b.addEventListener("click", () => PM.openContract(b.dataset.contract)));
-    $$("[data-doc]").forEach((b) => b.addEventListener("click", () => { const [id, k] = b.dataset.doc.split("|"); PM.modal("Документ клиента", `<img class="doc-big" src="${S.booking(id).docs[k]}" alt="Фото документа">`); }));
-    $$("[data-status]").forEach((s) => s.addEventListener("change", () => { S.updateCar(s.dataset.status, { status: s.value }); PM.toast("Статус обновлён на сайте"); PM.route(); }));
+    $$("[data-contract]").forEach((b) => b.addEventListener("click", () => RC.openContract(b.dataset.contract)));
+    $$("[data-doc]").forEach((b) => b.addEventListener("click", () => { const [id, k] = b.dataset.doc.split("|"); RC.modal("Документ клиента", `<img class="doc-big" src="${S.booking(id).docs[k]}" alt="Фото документа">`); }));
+    $$("[data-status]").forEach((s) => s.addEventListener("change", () => { S.updateCar(s.dataset.status, { status: s.value }); RC.toast("Статус обновлён на сайте"); RC.route(); }));
     $$("[data-price]").forEach((i) => i.addEventListener("change", () => {
       const c = S.car(i.dataset.price), p = Math.max(500, Math.round(+i.value / 100) * 100); const k = p / c.prices[0];
-      S.updateCar(c.id, { prices: c.prices.map((x, idx) => idx === 0 ? p : Math.round(x * k / 100) * 100) }); PM.toast("Цена обновлена, скидки за срок пересчитаны"); PM.route();
+      S.updateCar(c.id, { prices: c.prices.map((x, idx) => idx === 0 ? p : Math.round(x * k / 100) * 100) }); RC.toast("Цена обновлена, скидки за срок пересчитаны"); RC.route();
     }));
-    const del = (id) => { const c = S.car(id); const m = PM.modal("Удалить машину?", `<p class="muted">${esc(carName(c))}, ${esc(c.plate)} пропадёт с сайта. Брони по ней останутся в истории.</p><div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-stop" data-yes>Удалить</button><button class="btn btn-ghost" data-no>Оставить</button></div>`);
-      $("[data-yes]", m.el).addEventListener("click", () => { S.removeCar(id); m.close(); PM.toast("Машина удалена"); PM.route(); }); $("[data-no]", m.el).addEventListener("click", m.close); };
+    const del = (id) => { const c = S.car(id); const m = RC.modal("Удалить машину?", `<p class="muted">${esc(carName(c))}, ${esc(c.plate)} пропадёт с сайта. Брони по ней останутся в истории.</p><div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-stop" data-yes>Удалить</button><button class="btn btn-ghost" data-no>Оставить</button></div>`);
+      $("[data-yes]", m.el).addEventListener("click", () => { S.removeCar(id); m.close(); RC.toast("Машина удалена"); RC.route(); }); $("[data-no]", m.el).addEventListener("click", m.close); };
     $$("[data-del]").forEach((b) => b.addEventListener("click", () => del(b.dataset.del)));
     const add = $("[data-addcar]");
     if (add) add.addEventListener("click", () => {
-      const m = PM.modal("Новая машина", addCarForm()); let photo = null;
-      $("#a-photo", m.el).addEventListener("change", async (e) => { try { photo = await PM.compressImage(e.target.files[0], 900); const box = $("#a-photo-box", m.el); box.classList.add("has"); box.insertAdjacentHTML("afterbegin", `<img src="${photo}" alt="">`); } catch (ex) { PM.toast(ex.message); } });
+      const m = RC.modal("Новая машина", addCarForm()); let photo = null;
+      $("#a-photo", m.el).addEventListener("change", async (e) => { try { photo = await RC.compressImage(e.target.files[0], 900); const box = $("#a-photo-box", m.el); box.classList.add("has"); box.insertAdjacentHTML("afterbegin", `<img src="${photo}" alt="">`); } catch (ex) { RC.toast(ex.message); } });
       $("#addcar", m.el).addEventListener("submit", (e) => {
         e.preventDefault(); const v = (id) => $("#" + id, m.el).value.trim();
         if (!v("a-brand") || !v("a-model") || !photo) { $("#a-err", m.el).hidden = false; return; }
@@ -179,10 +179,10 @@
         S.addCar({ id: (v("a-brand") + "-" + Date.now()).toLowerCase().replace(/[^a-z0-9-]/g, ""), brand: v("a-brand"), model: v("a-model"), year: +v("a-year") || 2024, cls: v("a-cls"), img: photo,
           kpp: v("a-kpp"), fuel: v("a-fuel"), engine: "—", cons: "—", seats: 5, color: "—", plate: v("a-plate") || "без номера", taxi: $("#a-taxi", m.el).checked, status: "free",
           prices: [p, r(p * 0.93), r(p * 0.85), r(p * 0.77)], features: ["Зимняя резина", "ОСАГО"] });
-        m.close(); PM.toast("Машина добавлена и уже видна в каталоге"); PM.route();
+        m.close(); RC.toast("Машина добавлена и уже видна в каталоге"); RC.route();
       });
     });
   }
 
-  PM.admin = { view, bind };
+  RC.admin = { view, bind };
 })();
