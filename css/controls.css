@@ -1,0 +1,56 @@
+/* Свои поля даты и выпадающие списки в стиле стеклянных плиток */
+
+.rc-native { position: absolute !important; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none !important; overflow: hidden; clip-path: inset(50%); }
+.rc-field { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; cursor: pointer; }
+.rc-field svg { width: 18px; height: 18px; color: var(--mute); flex: none; transition: transform .2s; }
+.rc-field .rc-val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rc-field .rc-val.ph { color: var(--dim); }
+.rc-field:hover { border-color: var(--stroke-2); }
+.rc-field.is-open { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.rc-select.is-open svg { transform: rotate(180deg); }
+.rc-select { padding-right: 14px !important; background-image: none !important; }
+
+.rc-pop { position: absolute; z-index: 120; background: var(--tile-solid); border: 1px solid var(--stroke-2); border-radius: var(--r-lg);
+  box-shadow: 0 24px 48px -18px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .02) inset; padding: 8px; color: var(--fg);
+  max-width: calc(100vw - 16px); animation: pop-in .14s ease-out; }
+@keyframes pop-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* Список */
+.rc-list { display: grid; gap: 2px; max-height: 300px; overflow-y: auto; }
+.rc-list button { appearance: none; border: 0; background: transparent; color: var(--fg); text-align: left; padding: 10px 12px; border-radius: 10px; cursor: pointer; font: inherit; white-space: nowrap; display: flex; justify-content: space-between; gap: 16px; }
+.rc-list button:hover, .rc-list button:focus-visible { background: var(--tile-2); outline: none; }
+.rc-list button[aria-selected="true"] { color: var(--accent); font-weight: 600; }
+.rc-list button[aria-selected="true"]::after { content: "✓"; }
+.rc-list button[disabled] { color: var(--dim); cursor: not-allowed; }
+
+/* Календарь */
+.rc-dp { width: 300px; padding: 12px; }
+.dp-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.dp-title { appearance: none; border: 0; background: transparent; color: var(--fg); font: 600 .98rem var(--font); display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 10px; cursor: pointer; }
+.dp-title:hover { background: var(--tile-2); }
+.dp-title svg { width: 14px; height: 14px; color: var(--mute); }
+.dp-nav { display: flex; gap: 4px; }
+.dp-nav button { appearance: none; width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--stroke); background: var(--tile-2); color: var(--fg); display: grid; place-items: center; cursor: pointer; }
+.dp-nav button svg { width: 16px; height: 16px; }
+.dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.dp-dow { font-size: .72rem; color: var(--mute); text-align: center; padding: 4px 0 6px; }
+.dp-day { appearance: none; border: 0; background: transparent; color: var(--fg); aspect-ratio: 1; border-radius: 10px; font: 500 .88rem var(--font); font-variant-numeric: tabular-nums; cursor: pointer; position: relative; }
+.dp-day:hover:not([disabled]), .dp-day:focus-visible { background: var(--tile-2); outline: none; box-shadow: inset 0 0 0 1px var(--stroke-2); }
+.dp-day.today { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.dp-day.in { background: var(--accent-soft); border-radius: 4px; }
+.dp-day.edge { background: color-mix(in srgb, var(--accent) 35%, transparent); color: var(--fg); }
+.dp-day.sel { background: var(--accent); color: var(--accent-ink); font-weight: 700; box-shadow: 0 6px 16px -6px var(--accent); }
+.dp-day[disabled] { color: var(--dim); cursor: default; opacity: .5; }
+.dp-day.busy { opacity: 1; color: var(--stop); background: var(--stop-soft); text-decoration: line-through; }
+.dp-list { display: grid; gap: 4px; max-height: 260px; overflow-y: auto; }
+.dp-list.m { grid-template-columns: repeat(3, 1fr); max-height: none; }
+.dp-list.y { grid-template-columns: repeat(4, 1fr); }
+.dp-list button { appearance: none; border: 0; background: var(--tile-2); color: var(--fg); padding: 10px 4px; border-radius: 10px; font: 500 .9rem var(--font); cursor: pointer; font-variant-numeric: tabular-nums; }
+.dp-list button:hover { box-shadow: inset 0 0 0 1px var(--stroke-2); }
+.dp-list button.sel { background: var(--accent); color: var(--accent-ink); }
+.dp-list button[disabled] { opacity: .35; cursor: default; }
+.dp-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--stroke); }
+.dp-foot button { appearance: none; border: 0; background: transparent; color: var(--accent); font: 600 .86rem var(--font); padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+.dp-foot button:hover { background: var(--accent-soft); }
+.dp-legend { font-size: .76rem; color: var(--mute); display: inline-flex; align-items: center; gap: 6px; }
+.dp-legend i { width: 10px; height: 10px; border-radius: 3px; background: var(--stop-soft); box-shadow: inset 0 0 0 1px var(--stop); }
