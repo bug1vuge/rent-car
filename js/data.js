@@ -18,7 +18,7 @@ RC.BIZ = {
   yandex: "https://yandex.ru/maps/?pt=84.988441,56.499881&z=14&l=map",
   yandexRoute: "https://yandex.ru/maps/?rtext=~56.499881,84.988441&rtt=auto",
   /* Масштаб 14: видно район и дорогу до центра */
-  yandexWidget: "https://yandex.ru/map-widget/v1/?ll=84.975%2C56.493&z=14&pt=84.988441%2C56.499881%2Cpm2blm",
+  mapCenter: "84.975%2C56.493",
   district: "Октябрьский район, около 3 км к северо-востоку от центра",
   gis: "https://2gis.ru/tomsk/firm/422740746064782",
   vk: "https://vk.com/",

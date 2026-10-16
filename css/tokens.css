@@ -43,6 +43,9 @@
   --map-bg: #0E1420;
   --map-road: #1D2636;
   --map-block: #141B28;
+  /* Яндекс Карта в ночном режиме: инверсия в тёмную гамму и синий оттенок сервиса */
+  --map-filter: invert(.91) hue-rotate(188deg) saturate(.7) brightness(.95) contrast(.95);
+  --map-tint: rgba(40, 110, 255, .16);
 
   --font: "Onest", "Segoe UI", Roboto, Arial, sans-serif;
   --r-xl: 26px;
@@ -67,6 +70,7 @@
     --stage-top: #FAFBFC; --stage-floor: #DDE1E7;
     --shadow: 0 1px 0 rgba(255, 255, 255, .9) inset, 0 18px 36px -26px rgba(20, 30, 50, .35);
     --map-bg: #EEF1F5; --map-road: #FFFFFF; --map-block: #E2E6EC;
+    --map-filter: saturate(.75) contrast(.98); --map-tint: rgba(31, 111, 235, .04);
     color-scheme: light;
   }
 }
@@ -83,5 +87,6 @@
   --stage-top: #FAFBFC; --stage-floor: #DDE1E7;
   --shadow: 0 1px 0 rgba(255, 255, 255, .9) inset, 0 18px 36px -26px rgba(20, 30, 50, .35);
   --map-bg: #EEF1F5; --map-road: #FFFFFF; --map-block: #E2E6EC;
+  --map-filter: saturate(.75) contrast(.98); --map-tint: rgba(31, 111, 235, .04);
   color-scheme: light;
 }
