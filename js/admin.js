@@ -125,7 +125,7 @@
   function fleet() {
     return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px"><p class="muted small" style="max-width:60ch">Статус и цена сразу меняются на сайте. Машина «На ТО» или «Скрыта» не показывается свободной.</p><button class="btn btn-primary btn-sm" data-addcar>Добавить машину</button></div>
       <div class="fleet" style="padding-bottom:56px">${S.cars.map((c) => `<div class="fleet-row">
-        <div class="fimg"><img src="${c.cut || c.img}" alt=""></div>
+        <div class="fimg">${RC.carVisual(c)}</div>
         <div style="min-width:0"><b>${esc(carName(c))}</b> <span class="muted small">${c.year}</span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px"><span class="plate">${esc(c.plate)}</span><span class="small muted">${RC.CLASSES[c.cls].label} · ${esc(c.kpp)}</span></div><span class="small st-${S.liveStatus(c).key}" style="display:block;padding-top:4px;font-weight:600">${esc(c.status === "hidden" ? "Скрыта с сайта" : S.liveStatus(c).label)}</span></div>
         <div class="f-controls">
           <div class="field"><label for="st-${c.id}">Статус</label><select class="input" id="st-${c.id}" data-status="${c.id}"><option value="free" ${c.status === "free" ? "selected" : ""}>В работе</option><option value="service" ${c.status === "service" ? "selected" : ""}>На ТО</option><option value="hidden" ${c.status === "hidden" ? "selected" : ""}>Скрыта</option></select></div>

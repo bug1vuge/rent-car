@@ -26,7 +26,7 @@ RC.store = (function () {
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* хранилище недоступно: работаем в памяти */ } }
   function reset(doSave = true) {
-    state = { cars: JSON.parse(JSON.stringify(RC.SEED_CARS)), bookings: RC.seedBookings(), seq: 1046 };
+    state = { cars: JSON.parse(JSON.stringify(RC.SEED_CARS)), bookings: RC.seedBookings(), seq: 1047 };
     state.bookings.forEach((b) => { const car = state.cars.find((c) => c.id === b.carId); const q = quote(car, b.from, b.to, b.extras); b.total = q.total; b.deposit = q.deposit; });
     if (doSave) save(); else save();
   }

@@ -114,3 +114,13 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .x { appearance: none; border: 1px solid var(--stroke); background: var(--tile-2); width: 38px; height: 38px; border-radius: 12px; cursor: pointer; font-size: 1.2rem; flex: none; color: var(--fg); }
 .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 90; background: var(--fg); color: var(--bg); font-weight: 600; padding: 12px 20px; border-radius: 999px; max-width: calc(100% - 32px); text-align: center; box-shadow: 0 12px 30px -12px rgba(0, 0, 0, .5); }
 @media (min-width: 900px) { .toast { bottom: 28px; } }
+
+/* Силуэт машины без фото */
+.sil-wrap { position: relative; display: block; aspect-ratio: 480 / 190; max-width: 100%; height: 100%; }
+.sil-wrap svg { display: block; width: 100%; height: 100%; }
+.sil-note { position: absolute; right: 4px; bottom: -2px; font-size: .62rem; color: var(--dim); letter-spacing: .02em; }
+.car-img .sil-wrap { height: 118px; }
+.mini .sil-wrap { height: 88px; }
+.stage-car .sil-wrap { height: clamp(150px, 22vw, 260px); z-index: 1; }
+.simg .sil-wrap { height: 46px; } .bimg .sil-wrap { height: 60px; } .fimg .sil-wrap { height: 44px; }
+.simg .sil-note, .bimg .sil-note, .fimg .sil-note { display: none; }

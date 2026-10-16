@@ -73,7 +73,40 @@ RC.SEED_CARS = [
   { id: "hongqi-3", brand: "Hongqi", model: "H5", year: 2023, cls: "premium", img: "img/premium.webp", cut: "img/cut-premium.webp",
     kpp: "АКПП", fuel: "Бензин", engine: "1.5T · 169 л.с.", cons: "7,2 л / 100 км", seats: 5, color: "Чёрный",
     plate: "Т 684 НУ 761", taxi: false, status: "service", prices: [7000, 6600, 6200, 5800],
-    features: ["Кожаный салон", "Адаптивный круиз", "Камеры 360°", "КАСКО включено"] }
+    features: ["Кожаный салон", "Адаптивный круиз", "Камеры 360°", "КАСКО включено"] },
+  /* Ниже — машины без фото: показываются силуэтом, фото добавит владелец */
+  { id: "rio-1", brand: "Kia", model: "Rio", year: 2023, cls: "econom", body: "sedan", paint: "#E7EAEE",
+    kpp: "АКПП", fuel: "Бензин", engine: "1.6 л · 123 л.с.", cons: "6,6 л / 100 км", seats: 5, color: "Белый",
+    plate: "С 210 КМ 70", taxi: true, status: "free", prices: [2600, 2400, 2200, 2000],
+    features: ["Кондиционер", "Подогрев сидений", "Bluetooth", "Зимняя резина"] },
+  { id: "solaris-1", brand: "Hyundai", model: "Solaris", year: 2022, cls: "econom", body: "sedan", paint: "#8E959E",
+    kpp: "АКПП", fuel: "Бензин", engine: "1.6 л · 123 л.с.", cons: "6,7 л / 100 км", seats: 5, color: "Серебристый",
+    plate: "Е 437 ТО 70", taxi: true, status: "free", prices: [2500, 2300, 2100, 1900],
+    features: ["Кондиционер", "Подогрев руля", "Камера заднего вида", "Зимняя резина"] },
+  { id: "vesta-1", brand: "Lada", model: "Vesta", year: 2024, cls: "econom", body: "sedan", paint: "#2D5DA8",
+    kpp: "МКПП", fuel: "Газ + бензин", engine: "1.6 л · 106 л.с.", cons: "≈ 3 ₽ / км на газу", seats: 5, color: "Синий",
+    plate: "К 882 ВХ 70", taxi: true, status: "free", prices: [2300, 2100, 1900, 1700],
+    features: ["ГБО — дешёвый километр", "Мультимедиа 8″", "Круиз-контроль", "Зимняя резина"] },
+  { id: "riox-1", brand: "Kia", model: "Rio X", year: 2022, cls: "econom", body: "hatch", paint: "#E2702E",
+    kpp: "АКПП", fuel: "Бензин", engine: "1.6 л · 123 л.с.", cons: "6,9 л / 100 км", seats: 5, color: "Оранжевый",
+    plate: "М 519 АР 70", taxi: false, status: "free", prices: [2700, 2500, 2300, 2100],
+    features: ["Увеличенный клиренс", "Подогрев сидений", "Парктроники", "Зимняя резина"] },
+  { id: "jolion-1", brand: "Haval", model: "Jolion", year: 2024, cls: "comfort", body: "suv", paint: "#B3262F",
+    kpp: "Робот", fuel: "Бензин", engine: "1.5T · 150 л.с.", cons: "7,9 л / 100 км", seats: 5, color: "Красный",
+    plate: "О 774 МН 70", taxi: false, status: "free", prices: [3800, 3600, 3300, 3000],
+    features: ["Кроссовер, клиренс 190 мм", "Климат-контроль", "Камера 360°", "Подогрев руля и сидений", "Зимняя резина"] },
+  { id: "tiggo-1", brand: "Chery", model: "Tiggo 7 Pro Max", year: 2024, cls: "comfort", body: "suv", paint: "#2B2F36",
+    kpp: "Вариатор", fuel: "Бензин", engine: "1.5T · 147 л.с.", cons: "8,1 л / 100 км", seats: 5, color: "Чёрный",
+    plate: "Х 305 ЕС 70", taxi: false, status: "free", prices: [4300, 4000, 3700, 3400],
+    features: ["Панорамная крыша", "Камера 360°", "Электропривод багажника", "Вентиляция сидений", "Зимняя резина"] },
+  { id: "camry-1", brand: "Toyota", model: "Camry", year: 2023, cls: "premium", body: "sedan", paint: "#15171C",
+    kpp: "АКПП", fuel: "Бензин", engine: "2.5 л · 200 л.с.", cons: "8,3 л / 100 км", seats: 5, color: "Чёрный",
+    plate: "А 777 УК 70", taxi: false, status: "free", prices: [8000, 7500, 7000, 6500],
+    features: ["Кожаный салон", "Адаптивный круиз", "Вентиляция сидений", "JBL", "КАСКО включено"] },
+  { id: "monjaro-1", brand: "Geely", model: "Monjaro", year: 2024, cls: "premium", body: "suv", paint: "#6E7781",
+    kpp: "АКПП", fuel: "Бензин", engine: "2.0T · 238 л.с.", cons: "8,8 л / 100 км", seats: 5, color: "Серый",
+    plate: "В 900 ОР 70", taxi: false, status: "free", prices: [8500, 8000, 7500, 7000],
+    features: ["Полный привод", "Проекция на стекло", "Камеры 360°", "Массаж сидений", "КАСКО включено"] }
 ];
 
 /* Брони относительно сегодняшней даты, чтобы демо всегда выглядело живым */
@@ -100,7 +133,16 @@ RC.seedBookings = function () {
       extras: [], total: 12600, deposit: 5000, createdAt: d(-14) },
     { id: "RC-1035", carId: "changan-1", from: d(-9), to: d(-2), status: "done", demo: true, mine: false,
       client: { name: "Мария Лапина", phone: "+7 913 777-30-30", birth: "1997-12-12", license: "70 19 202020", licenseSince: "2016-09-09" },
-      extras: [], total: 19600, deposit: 10000, createdAt: d(-10) }
+      extras: [], total: 19600, deposit: 10000, createdAt: d(-10) },
+    { id: "RC-1036", carId: "solaris-1", from: d(-3), to: d(11), status: "active", demo: true, mine: false,
+      client: { name: "Тимур Галиев", phone: "+7 952 300-12-77", birth: "1994-02-18", license: "70 17 556677", licenseSince: "2014-04-02" },
+      extras: [], total: 0, deposit: 5000, createdAt: d(-4) },
+    { id: "RC-1039", carId: "camry-1", from: d(3), to: d(6), status: "approved", demo: true, mine: false,
+      client: { name: "Алексей Морозов", phone: "+7 913 440-81-20", birth: "1986-10-09", license: "70 12 889900", licenseSince: "2006-07-15" },
+      extras: ["delivery"], total: 0, deposit: 30000, createdAt: d(-1) },
+    { id: "RC-1046", carId: "jolion-1", from: d(1), to: d(4), status: "new", demo: true, mine: false,
+      client: { name: "Анна Ершова", phone: "+7 923 615-04-33", birth: "1999-06-27", license: "70 21 123987", licenseSince: "2019-03-11" },
+      extras: ["child"], total: 0, deposit: 10000, createdAt: d(0) }
   ];
 };
 

@@ -100,7 +100,7 @@
   function carCard(car) {
     const st = carStatus(car);
     return `<a class="car" href="#car-${car.id}">
-      <div class="car-img">${car.cut ? `<img src="${car.cut}" alt="${esc(car.brand + " " + car.model)}" loading="lazy">` : `<img class="photo" src="${car.img}" alt="${esc(car.brand + " " + car.model)}" loading="lazy">`}<span class="status st-${st.key}">${esc(st.label)}</span></div>
+      <div class="car-img">${RC.carVisual(car)}<span class="status st-${st.key}">${esc(st.label)}</span></div>
       <div class="car-body">
         <div class="car-title"><h3>${esc(car.brand)} ${esc(car.model)}</h3><span class="year">${car.year}</span></div>
         <div class="specs"><span class="spec">${clsLabel(car.cls)}</span><span class="spec">${esc(car.kpp)}</span>${car.fuel !== "Бензин" ? `<span class="spec accent">${esc(car.fuel)}</span>` : `<span class="spec">${esc(car.fuel)}</span>`}${car.taxi ? '<span class="spec">Под такси</span>' : ""}</div>
@@ -133,7 +133,7 @@
 
   /* ——— Главная: дашборд ——— */
   const H = { cls: "comfort", id: null };
-  const carImg = (car, cls = "") => car.cut ? `<img src="${car.cut}" alt="${esc(car.brand + " " + car.model)}" class="${cls}">` : `<img src="${car.img}" alt="${esc(car.brand + " " + car.model)}" class="photo ${cls}">`;
+  const carImg = (car, cls = "") => RC.carVisual(car, cls);
   const freeRank = (c) => (datesSet() && S.isFree(c, F.from, F.to) ? 0 : 1) + (S.liveStatus(c).key === "free" ? 0 : 1);
   const classCars = (cls) => S.visibleCars().filter((c) => c.cls === cls).sort((a, b) => freeRank(a) - freeRank(b) || a.prices[0] - b.prices[0]);
   const stageCar = () => {
@@ -358,7 +358,7 @@
         <section class="tile car-stage">
           <div class="head"><div><h1>${esc(car.brand)} ${esc(car.model)}</h1><p class="muted" style="margin-top:6px">${car.year} · ${cl.label} · ${esc(car.engine)}</p></div>
           <span class="status st-${S.liveStatus(car).key}">${esc(S.liveStatus(car).label)}</span></div>
-          <div class="stage-car">${car.cut ? `<img src="${car.cut}" alt="${esc(car.brand + " " + car.model)}">` : `<img src="${car.img}" alt="${esc(car.brand + " " + car.model)}" style="border-radius:16px">`}</div>
+          <div class="stage-car">${RC.carVisual(car)}</div>
         </section>
         <section class="tile"><dl class="spec-table">
           <div><dt>Год</dt><dd>${car.year}</dd></div><div><dt>Класс</dt><dd>${cl.label}</dd></div>
@@ -429,7 +429,7 @@
   }
   function sideHTML(car) {
     const q = S.quote(car, W.from, W.to, W.extras);
-    return `<div class="side-car"><div class="simg"><img src="${car.cut || car.img}" alt=""></div><div><b>${esc(car.brand)} ${esc(car.model)}</b><div class="small muted">${car.year} · ${esc(car.kpp)} · ${clsLabel(car.cls)}</div></div></div>
+    return `<div class="side-car"><div class="simg">${RC.carVisual(car)}</div><div><b>${esc(car.brand)} ${esc(car.model)}</b><div class="small muted">${car.year} · ${esc(car.kpp)} · ${clsLabel(car.cls)}</div></div></div>
       <div class="small muted">${U.fmtDate(W.from, { day: "numeric", month: "long" })} — ${U.fmtDate(W.to, { day: "numeric", month: "long" })}</div>
       <div class="summary">${q.lines.map((l) => `<div class="line"><span>${esc(l.label)}</span><span>${U.rub(l.sum)}</span></div>`).join("")}
         <div class="line"><span>Залог, вернём</span><span>${q.deposit ? U.rub(q.deposit) : "без залога"}</span></div>
@@ -620,8 +620,8 @@
   function viewCabinet() {
     const mine = S.bookings.filter((b) => b.mine);
     return `<div class="page-head"><h1>Мои брони</h1><p class="lead">Статус заявки, договор и даты в одном месте.</p></div>
-    <div class="bk-list">${mine.length ? mine.map((b) => { const car = S.car(b.carId) || { brand: "Машина", model: "удалена", img: "" };
-      return `<div class="bk"><div class="bimg"><img src="${car.cut || car.img}" alt=""></div><div style="display:grid;gap:6px;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><b>${esc(car.brand)} ${esc(car.model)}</b>${RC.statusPill(b.status)}</div>
+    <div class="bk-list">${mine.length ? mine.map((b) => { const car = S.car(b.carId) || { brand: "Машина", model: "удалена", body: "sedan", paint: "#6B7280" };
+      return `<div class="bk"><div class="bimg">${RC.carVisual(car)}</div><div style="display:grid;gap:6px;min-width:0"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><b>${esc(car.brand)} ${esc(car.model)}</b>${RC.statusPill(b.status)}</div>
         <span class="muted small">${esc(b.id)} · ${U.fmtDate(b.from)} — ${U.fmtDate(b.to)}</span><span class="num">${U.rub(b.total)}${b.deposit ? " + залог " + U.rub(b.deposit) : ""}</span>
         ${b.status === "new" ? '<span class="small muted">Ждёт подтверждения владельца</span>' : b.status === "approved" ? `<span class="small" style="color:var(--go)">Подтверждена. Ждём ${U.fmtDate(b.from)} на Пушкина, 61а</span>` : b.status === "rejected" ? '<span class="small" style="color:var(--stop)">Владелец отклонил заявку. Позвоните, чтобы подобрать другую машину</span>' : ""}</div>
         <div class="bk-actions"><button class="btn btn-ghost btn-sm" data-contract="${b.id}">Договор</button><a class="btn btn-ghost btn-sm" href="#car-${b.carId}">Машина</a></div></div>`; }).join("") :
