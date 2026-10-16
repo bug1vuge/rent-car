@@ -4,13 +4,14 @@
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   margin: 0; min-height: 100vh; color: var(--fg); font: 400 15px/1.55 var(--font);
-  background:
-    radial-gradient(1200px 600px at 12% -10%, var(--glow), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, var(--glow), transparent 55%),
-    var(--bg);
-  background-attachment: fixed;
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
+/* Свечение фона отдельным слоем: background-attachment: fixed вместе с размытием давал полосы в Chrome */
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(1200px 600px at 12% -10%, var(--glow), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, var(--glow), transparent 55%); }
 img { max-width: 100%; display: block; }
 a { color: inherit; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -32,7 +33,7 @@ p { margin: 0; }
 /* Плитка — главный строительный блок, как виджет на экране машины */
 .tile, .panel, .kpi, .req, .fleet-row, .gantt-wrap, .term, .c-item, .bk, .filters, .side-card, .empty, .car, .price-matrix-wrap, .done-hero {
   background: var(--tile); border: 1px solid var(--stroke); border-radius: var(--r-xl);
-  box-shadow: var(--shadow); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow: var(--shadow);
   padding: 20px; min-width: 0;
 }
 .tile-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
