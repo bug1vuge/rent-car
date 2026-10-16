@@ -34,9 +34,10 @@ window.RC = window.RC || {};
     const B = BODIES[bodyType] || BODIES.sedan; const id = "s" + (++uid); const c = color || "#9AA3AF";
     const top = shade(c, .28), bottom = shade(c, -.35);
     const wheel = (x) => `<circle cx="${x}" cy="150" r="${B.r + 7}" fill="${shade(c, -.6)}"/>
-      <circle cx="${x}" cy="150" r="${B.r}" fill="#111317"/><circle cx="${x}" cy="150" r="${B.r * .62}" fill="url(#${id}r)"/>
+      <circle cx="${x}" cy="150" r="${B.r}" fill="#111317"/>
+      <g class="sil-rim" data-cx="${x}"><circle cx="${x}" cy="150" r="${B.r * .62}" fill="url(#${id}r)"/>
       ${[0, 72, 144, 216, 288].map((a) => `<path d="M${x} 150 L${x + Math.cos(a * Math.PI / 180) * B.r * .58} ${150 + Math.sin(a * Math.PI / 180) * B.r * .58}" stroke="#5F6670" stroke-width="5" stroke-linecap="round"/>`).join("")}
-      <circle cx="${x}" cy="150" r="${B.r * .16}" fill="#2A2E35"/>`;
+      <circle cx="${x}" cy="150" r="${B.r * .16}" fill="#2A2E35"/></g>`;
     return `<svg class="silhouette" viewBox="0 0 480 190" role="img" aria-label="Иллюстрация автомобиля">
       <defs>
         <linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset=".45" stop-color="${c}"/><stop offset="1" stop-color="${bottom}"/></linearGradient>
@@ -59,6 +60,9 @@ window.RC = window.RC || {};
       ${B.wheels.map(wheel).join("")}
     </svg>`;
   };
+
+  /* Геометрия силуэта для анимации: колёса, радиус, фары, стоп-сигналы (в координатах viewBox 480×190) */
+  RC.silhouetteInfo = (bodyType) => { const B = BODIES[bodyType] || BODIES.sedan; return { wheels: B.wheels, r: B.r, wheelY: 150, head: { x: 30, y: 118 }, tail: { x: bodyType === "hatch" ? 418 : 456, y: bodyType === "suv" ? 112 : 118 } }; };
 
   /* Единая картинка машины: вырезка без фона → силуэт → обычное фото */
   RC.carVisual = function (car, cls) {

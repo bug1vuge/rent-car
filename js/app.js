@@ -152,6 +152,16 @@
     filtersFor(patch) { Object.assign(F, patch); saveF(); }
   };
 
+  /* Яндекс Карта в оформлении сервиса. В превью внутри песочницы внешние карты заблокированы —
+     там показывается схема и подпись, на сайте всегда настоящая карта. */
+  const FRAMED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+  RC.yandexMap = function ({ zoom = 14, interactive = true, label = "" } = {}) {
+    const turn = `<div class="nm-turn"><i>${ICO.turn}</i><span><b>Пушкина, 61а</b>${esc(label || "Мерседес-центр, парковка у шоурума")}</span></div>`;
+    if (FRAMED) return `<div class="ymap is-preview"><div class="navmap">${turn}${RC.navmapSVG()}</div><span class="ymap-note">В превью внешние карты отключены. На сайте здесь Яндекс Карта.</span></div>`;
+    const src = `https://yandex.ru/map-widget/v1/?ll=${B.mapCenter}&z=${zoom}&pt=${B.lon}%2C${B.lat}%2Cpm2blm`;
+    return `<div class="ymap ${interactive ? "" : "static"}"><iframe src="${src}" title="Яндекс Карта: ${esc(B.city)}, ${esc(B.address)}" loading="lazy" allowfullscreen></iframe>${turn}</div>`;
+  };
+
   RC.navmapSVG = function () {
     return `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect class="nm-bg" width="400" height="300"/>
@@ -200,7 +210,7 @@
       </div>
       <section class="tile w-map">
         <div class="tile-head"><div><h3>Место выдачи</h3><p>${esc(B.address)} · ${esc(B.place.split(",")[0])}</p></div><a class="tile-link" href="#contacts" aria-label="Открыть контакты">${ICO.right}</a></div>
-        <div class="navmap"><div class="nm-turn"><i>${ICO.turn}</i><span><b>Пушкина, 61а</b>парковка у шоурума</span></div>${RC.navmapSVG()}</div>
+        <a class="map-link" href="#contacts" aria-label="Открыть карту в контактах">${RC.yandexMap({ zoom: 13, interactive: false, label: "парковка у шоурума" })}</a>
       </section>
       <section class="tile w-dates" id="w-dates"></section>
       <section class="tile w-pay">
@@ -603,8 +613,7 @@
 
   /* ——— Контакты ——— */
   function viewContacts() {
-    const framed = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
-    const map = `<div class="navmap"><div class="nm-turn"><i>${ICO.turn}</i><span><b>Пушкина, 61а</b>Мерседес-центр, парковка у шоурума</span></div>${RC.navmapSVG()}</div>` + (framed ? "" : `<iframe src="${B.yandexWidget}" title="Карта: ${esc(B.city)}, ${esc(B.address)}" allowfullscreen onload="this.classList.add('ready')"></iframe>`);
+    const map = RC.yandexMap({ zoom: 14 });
     return `<div class="page-head"><h1>Контакты</h1><p class="lead">Машины стоят у Мерседес-центра на Пушкина. Перед приездом лучше позвонить, чтобы машину подготовили.</p></div>
     <div class="contacts">
       <div class="c-list">

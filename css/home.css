@@ -94,6 +94,20 @@
 .navmap .nm-turn i svg { width: 18px; height: 18px; }
 .navmap .nm-turn b { display: block; font-size: .9rem; }
 
+/* Яндекс Карта в оформлении навигатора */
+.map-link { display: block; text-decoration: none; color: inherit; }
+.ymap { position: relative; margin-top: 14px; border-radius: var(--r-lg); overflow: hidden; aspect-ratio: 4 / 3; background: var(--map-bg); border: 1px solid var(--stroke); isolation: isolate; }
+.ymap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: var(--map-filter); }
+.ymap::after { content: ""; position: absolute; inset: 0; background: var(--map-tint); mix-blend-mode: color; pointer-events: none; z-index: 1; }
+.ymap.static iframe { pointer-events: none; }
+.ymap .nm-turn { position: absolute; left: 10px; top: 10px; z-index: 2; pointer-events: none; display: flex; gap: 10px; align-items: center; background: var(--tile-solid); border: 1px solid var(--stroke); border-radius: 14px; padding: 8px 12px 8px 8px; font-size: .8rem; box-shadow: var(--shadow); }
+.ymap .nm-turn i { width: 30px; height: 30px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-style: normal; }
+.ymap .nm-turn i svg { width: 18px; height: 18px; }
+.ymap .nm-turn b { display: block; font-size: .9rem; }
+.ymap.is-preview::after { display: none; }
+.ymap .navmap { position: absolute; inset: 0; margin: 0; aspect-ratio: auto; border: 0; border-radius: 0; }
+.ymap-note { position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 2; font-size: .74rem; color: var(--mute); background: var(--tile-solid); border: 1px solid var(--stroke); border-radius: 10px; padding: 6px 10px; }
+
 /* Даты */
 .dates { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; margin-top: 16px; }
 .dbox { background: var(--tile-2); border: 1px solid var(--stroke); border-radius: var(--r-lg); padding: 12px 6px; display: grid; justify-items: center; gap: 2px; position: relative; }
